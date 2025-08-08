@@ -2,7 +2,7 @@ import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { Mail, Phone, MapPin, Linkedin, Link } from "lucide-react";
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <section className="mb-3 break-inside-avoid">
+  <section className="break-inside-avoid pt-4 first:pt-0">
     <h2 className="text-sm font-bold text-primary tracking-widest uppercase bg-primary/10 p-2 rounded-sm mb-3">{title}</h2>
     <div className="text-sm">{children}</div>
   </section>
