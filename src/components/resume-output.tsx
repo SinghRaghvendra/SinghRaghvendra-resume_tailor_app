@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, MapPin, Linkedin, Dot, Link } from "lucide-react";
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <section className="mb-6 break-after-page">
+  <section className="mb-6 break-inside-avoid">
     <h2 className="text-xl font-bold text-primary border-b-2 border-primary pb-1 mb-3">{title.toUpperCase()}</h2>
     <div className="text-sm">{children}</div>
   </section>
@@ -48,7 +48,7 @@ export const ResumeOutput = (props: ExtractAndMatchOutput) => {
         {props.experience?.length > 0 && (
             <Section title="Experience">
             {props.experience.map((exp, index) => (
-                <div key={index} className="mb-4 last:mb-0">
+                <div key={index} className="mb-4 last:mb-0 break-inside-avoid">
                 <div className="flex justify-between items-baseline">
                     <h3 className="font-bold text-base text-gray-800">{exp.role}</h3>
                     <span className="text-xs font-medium text-muted-foreground">{exp.period}</span>
@@ -67,7 +67,7 @@ export const ResumeOutput = (props: ExtractAndMatchOutput) => {
         {props.portfolio?.length > 0 && (
           <Section title="Portfolio">
             {props.portfolio.map((project, index) => (
-              <div key={index} className="mb-4 last:mb-0">
+              <div key={index} className="mb-4 last:mb-0 break-inside-avoid">
                 <div className="flex justify-between items-baseline">
                   <h3 className="font-bold text-base text-gray-800">{project.projectName}</h3>
                   {project.url && (
@@ -86,7 +86,7 @@ export const ResumeOutput = (props: ExtractAndMatchOutput) => {
         {props.education?.length > 0 && (
             <Section title="Education">
             {props.education.map((edu, index) => (
-                <div key={index} className="mb-3 last:mb-0">
+                <div key={index} className="mb-3 last:mb-0 break-inside-avoid">
                 <div className="flex justify-between items-baseline">
                     <h3 className="font-bold text-base text-gray-800">{edu.degree}</h3>
                     <span className="text-xs font-medium text-muted-foreground">{edu.year}</span>

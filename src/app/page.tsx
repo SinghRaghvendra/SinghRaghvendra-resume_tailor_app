@@ -192,217 +192,219 @@ export default function Home() {
 
   return (
     <>
-    <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16 no-print">
-      <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-        <Logo className="h-14 w-14 text-primary" />
-        <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
-          Resume Tailor
-        </h1>
-        <p className="max-w-[800px] text-muted-foreground md:text-xl">
-          Instantly tailor your resume and generate a cover letter for any job. Our AI analyzes the job
-          description and your experience to highlight your most relevant
-          skills.
-        </p>
-      </div>
+    <div className="no-print">
+        <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+            <Logo className="h-14 w-14 text-primary" />
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
+            Resume Tailor
+            </h1>
+            <p className="max-w-[800px] text-muted-foreground md:text-xl">
+            Instantly tailor your resume and generate a cover letter for any job. Our AI analyzes the job
+            description and your experience to highlight your most relevant
+            skills.
+            </p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-12">
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Your Details</CardTitle>
-            <CardDescription>
-              Provide your resume and the job description below.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
-                <Tabs value={activeInputTab} onValueChange={setActiveInputTab} className="w-full">
-                  <div className="flex justify-between items-center mb-2">
-                    <FormLabel>Your Resume</FormLabel>
-                    <TabsList className="grid w-full max-w-[220px] grid-cols-2 h-9">
-                      <TabsTrigger value="file">PDF</TabsTrigger>
-                      <TabsTrigger value="text">Text</TabsTrigger>
-                    </TabsList>
-                  </div>
-                   <TabsContent value="file">
-                     <FormField
-                        control={form.control}
-                        name="resumeFile"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                               <div className="flex items-center justify-center w-full">
-                                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted">
-                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                                            <p className="font-semibold text-primary px-2 text-center">{renderFileNames()}</p>
-                                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                            <p className="text-xs text-muted-foreground">PDFs (MAX. 4MB each)</p>
-                                        </div>
-                                        <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf" multiple
-                                            {...resumeFileRef}
-                                            onChange={(e) => {
-                                                field.onChange(e.target.files)
-                                            }}
-                                         />
-                                    </label>
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-12">
+            <Card className="w-full">
+            <CardHeader>
+                <CardTitle>Your Details</CardTitle>
+                <CardDescription>
+                Provide your resume and the job description below.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-8"
+                >
+                    <Tabs value={activeInputTab} onValueChange={setActiveInputTab} className="w-full">
+                    <div className="flex justify-between items-center mb-2">
+                        <FormLabel>Your Resume</FormLabel>
+                        <TabsList className="grid w-full max-w-[220px] grid-cols-2 h-9">
+                        <TabsTrigger value="file">PDF</TabsTrigger>
+                        <TabsTrigger value="text">Text</TabsTrigger>
+                        </TabsList>
+                    </div>
+                    <TabsContent value="file">
+                        <FormField
+                            control={form.control}
+                            name="resumeFile"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                <div className="flex items-center justify-center w-full">
+                                        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted">
+                                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                                                <p className="font-semibold text-primary px-2 text-center">{renderFileNames()}</p>
+                                                <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                                <p className="text-xs text-muted-foreground">PDFs (MAX. 4MB each)</p>
+                                            </div>
+                                            <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf" multiple
+                                                {...resumeFileRef}
+                                                onChange={(e) => {
+                                                    field.onChange(e.target.files)
+                                                }}
+                                            />
+                                        </label>
                                 </div> 
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </TabsContent>
+                    <TabsContent value="text">
+                        <FormField
+                        control={form.control}
+                        name="resume"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormControl>
+                                <Textarea
+                                placeholder="Paste your resume here..."
+                                className="min-h-[250px] resize-y"
+                                {...field}
+                                />
                             </FormControl>
                             <FormMessage />
-                          </FormItem>
+                            {form.formState.errors.resume && activeInputTab === 'file' && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
+                            </FormItem>
                         )}
-                      />
-                  </TabsContent>
-                  <TabsContent value="text">
+                        />
+                        <Button type="button" variant="link" size="sm" className="p-0 h-auto mt-2" onClick={handleUseSample}>Try with an example</Button>
+                    </TabsContent>
+                    </Tabs>
+
                     <FormField
-                      control={form.control}
-                      name="resume"
-                      render={({ field }) => (
+                    control={form.control}
+                    name="jobDescription"
+                    render={({ field }) => (
                         <FormItem>
-                          <FormControl>
+                        <FormLabel>Job Description</FormLabel>
+                        <FormControl>
                             <Textarea
-                              placeholder="Paste your resume here..."
-                              className="min-h-[250px] resize-y"
-                              {...field}
+                            placeholder="Paste the job description here..."
+                            className="min-h-[200px] resize-y"
+                            {...field}
                             />
-                          </FormControl>
-                           <FormMessage />
-                           {form.formState.errors.resume && activeInputTab === 'file' && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
+                        </FormControl>
+                        <FormMessage />
                         </FormItem>
-                      )}
+                    )}
                     />
-                     <Button type="button" variant="link" size="sm" className="p-0 h-auto mt-2" onClick={handleUseSample}>Try with an example</Button>
-                  </TabsContent>
-                </Tabs>
-
-                <FormField
-                  control={form.control}
-                  name="jobDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Paste the job description here..."
-                          className="min-h-[200px] resize-y"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="modificationPrompt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Additional Instructions (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="e.g., 'Make my resume more formal', 'Emphasize my leadership skills'"
-                          className="min-h-[100px] resize-y"
-                          {...field}
-                        />
-                      </FormControl>
-                       <FormDescription>
-                        Provide any specific instructions to customize your documents.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Wand2 className="mr-2 h-4 w-4" />
-                  )}
-                  Tailor Documents
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
-        <div className="mt-8 lg:mt-0">
-          <Card className="sticky top-8">
-             <CardHeader className="flex flex-row items-center justify-between">
-                <div className="space-y-1">
-                  <CardTitle>Your Tailored Documents</CardTitle>
-                  <CardDescription>
-                    Your AI-optimized resume and cover letter.
-                  </CardDescription>
-                </div>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handlePrint}
-                    disabled={!generationResult || isLoading}
-                    >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                </Button>
-              </CardHeader>
-            <CardContent className="min-h-[500px]">
-              {isLoading ? (
-                <div className="space-y-4 pt-6">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <div className="space-y-2 pt-4">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                  </div>
-                  <div className="space-y-2 pt-4">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-4/6" />
-                  </div>
-                  <div className="space-y-2 pt-4">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/6" />
-                  </div>
-                </div>
-              ) : generationResult ? (
-                 <Tabs defaultValue="documents" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="documents">Documents</TabsTrigger>
-                    <TabsTrigger value="insights">ATS Insights</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="documents">
-                     <div className="pt-6">
-                        <ResumeOutput {...generationResult} />
-                        <div className="p-8"><Separator /></div>
-                        <CoverLetterOutput {...generationResult} />
-                      </div>
-                  </TabsContent>
-                  <TabsContent value="insights">
-                    <div className="no-print">
-                      <AtsInsightsOutput {...generationResult} />
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg mt-6">
-                  <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Ready to stand out?
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Fill in the form to get your professionally tailored
-                    documents.
-                  </p>
-                </div>
-              )}
+                    <FormField
+                    control={form.control}
+                    name="modificationPrompt"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Additional Instructions (Optional)</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="e.g., 'Make my resume more formal', 'Emphasize my leadership skills'"
+                            className="min-h-[100px] resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>
+                            Provide any specific instructions to customize your documents.
+                        </FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Wand2 className="mr-2 h-4 w-4" />
+                    )}
+                    Tailor Documents
+                    </Button>
+                </form>
+                </Form>
             </CardContent>
-          </Card>
+            </Card>
+
+            <div className="mt-8 lg:mt-0">
+            <Card className="sticky top-8">
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div className="space-y-1">
+                    <CardTitle>Your Tailored Documents</CardTitle>
+                    <CardDescription>
+                        Your AI-optimized resume and cover letter.
+                    </CardDescription>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePrint}
+                        disabled={!generationResult || isLoading}
+                        >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                    </Button>
+                </CardHeader>
+                <CardContent className="min-h-[500px]">
+                {isLoading ? (
+                    <div className="space-y-4 pt-6">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="space-y-2 pt-4">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                    </div>
+                    <div className="space-y-2 pt-4">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-4/6" />
+                    </div>
+                    <div className="space-y-2 pt-4">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-2/6" />
+                    </div>
+                    </div>
+                ) : generationResult ? (
+                    <Tabs defaultValue="documents" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="documents">Documents</TabsTrigger>
+                        <TabsTrigger value="insights">ATS Insights</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="documents">
+                        <div className="pt-6">
+                            <ResumeOutput {...generationResult} />
+                            <div className="p-8"><Separator /></div>
+                            <CoverLetterOutput {...generationResult} />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="insights">
+                        <div className="no-print">
+                        <AtsInsightsOutput {...generationResult} />
+                        </div>
+                    </TabsContent>
+                    </Tabs>
+                ) : (
+                    <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg mt-6">
+                    <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold text-foreground">
+                        Ready to stand out?
+                    </h3>
+                    <p className="text-muted-foreground">
+                        Fill in the form to get your professionally tailored
+                        documents.
+                    </p>
+                    </div>
+                )}
+                </CardContent>
+            </Card>
+            </div>
         </div>
-      </div>
-    </main>
+        </main>
+    </div>
     {generationResult && (
         <div id="printable-area" className="only-print">
             <ResumeOutput {...generationResult} />

@@ -1,25 +1,19 @@
 @media print {
-  body * {
-    visibility: hidden;
+  body > *:not(#printable-area) {
+    display: none;
   }
   
   .no-print {
     display: none !important;
   }
   
-  #printable-area, #printable-area * {
-    visibility: visible;
-  }
-  
   #printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: auto;
+    display: block;
+    visibility: visible;
+    position: relative;
     color: #000;
   }
-
+  
   .only-print {
       display: block;
       visibility: visible;
@@ -27,6 +21,10 @@
 
   .break-after-page {
     page-break-after: always;
+  }
+
+  .break-inside-avoid {
+    page-break-inside: avoid;
   }
 
   @page {
