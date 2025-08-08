@@ -329,26 +329,26 @@ export default function Home() {
 
         <div className="mt-8 lg:mt-0">
           <Card className="sticky top-8">
-            <CardHeader className="flex flex-row items-center justify-between no-print">
-              <div className="space-y-1">
-                <CardTitle>Your Tailored Documents</CardTitle>
-                <CardDescription>
-                  Your AI-optimized resume and cover letter.
-                </CardDescription>
-              </div>
-               <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrint}
-                  disabled={!generationResult}
-                  >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
-              </Button>
-            </CardHeader>
+             <CardHeader className="flex flex-row items-center justify-between no-print">
+                <div className="space-y-1">
+                  <CardTitle>Your Tailored Documents</CardTitle>
+                  <CardDescription>
+                    Your AI-optimized resume and cover letter.
+                  </CardDescription>
+                </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePrint}
+                    disabled={!generationResult || isLoading}
+                    >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                </Button>
+              </CardHeader>
             <CardContent className="min-h-[500px]">
               {isLoading ? (
-                <div className="space-y-4">
+                <div className="space-y-4 pt-6">
                   <Skeleton className="h-6 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
                   <div className="space-y-2 pt-4">
@@ -367,19 +367,26 @@ export default function Home() {
                   </div>
                 </div>
               ) : generationResult ? (
-                <>
-                  <div id="printable-area">
-                    <ResumeOutput {...generationResult} />
-                    <div className="p-8"><Separator /></div>
-                    <CoverLetterOutput {...generationResult} />
-                  </div>
-                  <div className="no-print mt-8">
-                    <Separator className="my-6" />
-                     <AtsInsightsOutput {...generationResult} />
-                  </div>
-                </>
+                 <Tabs defaultValue="documents" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 no-print">
+                    <TabsTrigger value="documents">Documents</TabsTrigger>
+                    <TabsTrigger value="insights">ATS Insights</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="documents">
+                     <div id="printable-area" className="pt-6">
+                        <ResumeOutput {...generationResult} />
+                        <div className="p-8"><Separator /></div>
+                        <CoverLetterOutput {...generationResult} />
+                      </div>
+                  </TabsContent>
+                  <TabsContent value="insights">
+                    <div className="no-print">
+                      <AtsInsightsOutput {...generationResult} />
+                    </div>
+                  </TabsContent>
+                </Tabs>
               ) : (
-                <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg">
+                <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg mt-6">
                   <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold text-foreground">
                     Ready to stand out?
