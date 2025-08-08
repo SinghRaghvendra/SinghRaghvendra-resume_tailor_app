@@ -106,6 +106,7 @@ export default function Home() {
       resume: "",
       jobDescription: "",
       modificationPrompt: "",
+      resumeFile: undefined,
     },
     mode: 'onChange',
   });
@@ -399,3 +400,5 @@ export default function Home() {
     </main>
   );
 }
+
+    
