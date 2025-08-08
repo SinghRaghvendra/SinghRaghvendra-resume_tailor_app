@@ -60,7 +60,7 @@ export async function extractTextFromPdfAction(formData: FormData): Promise<stri
             const data = await pdf(buffer);
             combinedText += data.text + '\n\n';
         }
-        return combinedText;
+        return combinedText.trim();
     } catch (error) {
         console.error("Failed to parse PDF", error);
         throw new Error("Failed to extract text from one or more PDFs.");

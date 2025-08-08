@@ -185,7 +185,7 @@ export default function Home() {
     if (files && files.length > 0) {
       return Array.from(files).map((file: File) => file.name).join(', ');
     }
-    return '';
+    return 'No files selected';
   }
 
   return (
@@ -228,21 +228,16 @@ export default function Home() {
                      <FormField
                         control={form.control}
                         name="resumeFile"
-                        render={({ field: { onChange, value, ...fieldProps } }) => (
+                        render={({ field: { onChange, ...fieldProps } }) => (
                           <FormItem>
                             <FormControl>
                                <div className="flex items-center justify-center w-full">
                                     <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted">
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                             <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                                            {renderFileNames() ? (
-                                                <p className="font-semibold text-primary px-2 text-center">{renderFileNames()}</p>
-                                            ) : (
-                                                <>
-                                                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                                    <p className="text-xs text-muted-foreground">PDFs (MAX. 4MB each)</p>
-                                                </>
-                                            )}
+                                            <p className="font-semibold text-primary px-2 text-center">{renderFileNames()}</p>
+                                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                            <p className="text-xs text-muted-foreground">PDFs (MAX. 4MB each)</p>
                                         </div>
                                         <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf" multiple
                                             {...fieldProps}
@@ -380,7 +375,7 @@ export default function Home() {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg no-print">
+                <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg">
                   <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold text-foreground">
                     Ready to stand out?
