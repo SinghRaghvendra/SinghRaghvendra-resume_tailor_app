@@ -1,6 +1,6 @@
 import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Phone, MapPin, Linkedin, Dot } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Dot, Link } from "lucide-react";
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="mb-6">
@@ -62,6 +62,25 @@ export const ResumeOutput = (props: ExtractAndMatchOutput) => {
                 </div>
             ))}
             </Section>
+        )}
+
+        {props.portfolio?.length > 0 && (
+          <Section title="Portfolio">
+            {props.portfolio.map((project, index) => (
+              <div key={index} className="mb-4 last:mb-0">
+                <div className="flex justify-between items-baseline">
+                  <h3 className="font-bold text-base text-gray-800">{project.projectName}</h3>
+                  {project.url && (
+                    <a href={project.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-primary hover:underline">
+                      <Link size={12} />
+                      View Project
+                    </a>
+                  )}
+                </div>
+                <p>{project.description}</p>
+              </div>
+            ))}
+          </Section>
         )}
 
         {props.education?.length > 0 && (

@@ -37,6 +37,13 @@ const EducationItemSchema = z.object({
   details: z.string().optional(),
 });
 
+const PortfolioItemSchema = z.object({
+    projectName: z.string().describe("The name or title of the project."),
+    description: z.string().describe("A brief description of the project, ideally a single sentence."),
+    url: z.string().url().optional().describe("A URL to the project if available."),
+});
+
+
 const ExtractAndMatchOutputSchema = z.object({
   name: z.string(),
   phone: z.string(),
@@ -47,6 +54,7 @@ const ExtractAndMatchOutputSchema = z.object({
   skills: z.array(z.string()),
   experience: z.array(ExperienceItemSchema),
   education: z.array(EducationItemSchema),
+  portfolio: z.array(PortfolioItemSchema).describe("A list of up to 3-4 key projects for a portfolio section."),
   certifications: z.array(z.string()),
   hobbies: z.array(z.string()),
   coverLetter: z.string().describe('A tailored cover letter for the job application.'),
@@ -61,7 +69,7 @@ const prompt = ai.definePrompt({
   name: 'extractAndMatchPrompt',
   input: {schema: ExtractAndMatchInputSchema},
   output: {schema: ExtractAndMatchOutputSchema},
-  prompt: `You are an expert resume tailor and career coach with deep knowledge of Applicant Tracking Systems (ATS). Your task is to parse the provided resume, tailor it to a specific job description aiming for a 90% match for skills and keywords, generate a compelling cover letter, and return everything as a structured JSON object.
+  prompt: `You are an expert resume tailor and career coach with deep knowledge of Applicant Tracking Systems (ATS). Your task is to parse the provided resume, tailor it to a specific job description aiming for a 90% match for skills and keywords, generate a compelling cover letter, and return everything as a structured JSON object. The final resume should be a maximum of 3 pages.
 
 Your primary goal is to strategically incorporate relevant skills and keywords from the job description into the resume and cover letter. You must analyze the job description to identify the most critical skills, qualifications, and experiences.
 
@@ -76,9 +84,10 @@ Instructions:
 2.  **Analyze and Extract Keywords:** Carefully read the job description and extract all relevant skills, technologies, and action verbs.
 3.  **Skill Matching & Culling:** Compare extracted keywords with the skills in the resume. Add relevant skills from the job description. **Crucially, include only the top 10 most relevant skills for the job.** Remove any skills, experiences, or certifications from the original resume that do not align with the job description to ensure the final document is highly focused and relevant.
 4.  **Tailor Experience:** Rephrase bullet points in the 'experience' section to reflect the language and priorities of the job description. Use strong action verbs and quantify achievements wherever possible. Ensure each bullet point is a separate string in the 'description' array.
-5.  **Generate Cover Letter:** Write a professional and compelling cover letter. The cover letter should be tailored to the job description, highlight the candidate's most relevant qualifications from the tailored resume, and express genuine interest in the role and company. The tone should be professional yet personable. The output should be a single string with markdown for formatting (e.g., newlines for paragraphs).
-6.  **Rewrite for Impact:** Review and rewrite the entire resume for clarity, impact, and professional tone. The final output must be polished and free of grammatical errors.
-7.  **Format Output:** Return the complete, tailored resume and the cover letter as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
+5.  **Create Portfolio Section:** Identify and extract any projects mentioned in the resume. Format them for a new "Portfolio" section. If no projects are mentioned, you can leave this section empty.
+6.  **Generate Cover Letter:** Write a professional and compelling cover letter. The cover letter should be tailored to the job description, highlight the candidate's most relevant qualifications from the tailored resume, and express genuine interest in the role and company. The tone should be professional yet personable. The output should be a single string with markdown for formatting (e.g., newlines for paragraphs).
+7.  **Rewrite for Impact:** Review and rewrite the entire resume for clarity, impact, and professional tone. The final output must be polished and free of grammatical errors.
+8.  **Format Output:** Return the complete, tailored resume and the cover letter as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
 
 {{#if modificationPrompt}}
 **User Modifications:**
