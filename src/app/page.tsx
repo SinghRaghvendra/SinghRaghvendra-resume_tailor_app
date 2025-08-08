@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Download, Loader2, Sparkles, Wand2 } from "lucide-react";
+import { Download, Loader2, Sparkles, Wand2, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,43 +25,114 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { generateTailoredResumeAction } from "@/app/actions";
+import { generateTailoredResumeAction, extractTextFromPdfAction } from "@/app/actions";
 import { SAMPLE_RESUME } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/icons";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
+import { ResumeOutput } from "@/components/resume-output";
+
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
+const ACCEPTED_FILE_TYPES = ["application/pdf"];
 
 const formSchema = z.object({
-  resume: z
-    .string()
-    .min(100, "Please provide a more detailed resume.")
-    .max(15000, "Resume is too long."),
+  resume: z.string().optional(),
   jobDescription: z
     .string()
     .min(50, "Please provide a more detailed job description.")
     .max(10000, "Job description is too long."),
+  resumeFile: z
+    .any()
+    .optional(),
+}).refine(data => {
+    if (form?.getValues('activeTab') === 'text') {
+        return !!data.resume && data.resume.length > 0;
+    }
+    if (form?.getValues('activeTab') === 'file') {
+        return !!data.resumeFile && data.resumeFile.length > 0;
+    }
+    return false;
+}, {
+    message: "Please upload a resume or paste it as text.",
+    path: ["resume"],
+}).refine(data => {
+    if (form?.getValues('activeTab') === 'file' && data.resumeFile?.[0]) {
+        return data.resumeFile?.[0]?.size <= MAX_FILE_SIZE;
+    }
+    return true;
+}, {
+    message: `Max file size is 4MB.`,
+    path: ["resumeFile"],
+}).refine(data => {
+    if (form?.getValues('activeTab') === 'file' && data.resumeFile?.[0]) {
+        return ACCEPTED_FILE_TYPES.includes(data.resumeFile?.[0]?.type);
+    }
+    return true;
+}, {
+    message: "Only .pdf files are accepted.",
+    path: ["resumeFile"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
+let form: any;
 
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [tailoredResume, setTailoredResume] = React.useState("");
+  const [tailoredResume, setTailoredResume] = React.useState<ExtractAndMatchOutput | null>(null);
+  const [activeTab, setActiveTab] = React.useState("text");
   const { toast } = useToast();
 
-  const form = useForm<FormValues>({
+  form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       resume: "",
       jobDescription: "",
+      resumeFile: undefined,
     },
+    mode: 'onChange',
   });
+  
+  React.useEffect(() => {
+    form.setValue('activeTab', activeTab, { shouldValidate: true });
+  }, [activeTab]);
+
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
-    setTailoredResume("");
+    setTailoredResume(null);
+    let resumeText = values.resume;
+
     try {
+      if (activeTab === 'file' && values.resumeFile?.[0]) {
+        try {
+            const formData = new FormData();
+            formData.append('file', values.resumeFile[0]);
+            resumeText = await extractTextFromPdfAction(formData);
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "PDF Processing Error",
+            description: String(error),
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (!resumeText) {
+          toast({
+            variant: "destructive",
+            title: "Missing Resume",
+            description: "Please provide your resume as text or a PDF file.",
+          });
+          setIsLoading(false);
+          return;
+      }
+
       const result = await generateTailoredResumeAction(
-        values.resume,
+        resumeText,
         values.jobDescription
       );
       setTailoredResume(result);
@@ -81,14 +152,15 @@ export default function Home() {
   const handlePrint = () => {
     window.print();
   };
-  
+
   const handleUseSample = () => {
-    form.setValue('resume', SAMPLE_RESUME);
+    setActiveTab("text");
+    form.setValue("resume", SAMPLE_RESUME, { shouldValidate: true });
     toast({
-        title: "Sample resume loaded",
-        description: "A sample resume has been added to the form.",
+      title: "Sample resume loaded",
+      description: "A sample resume has been added to the form.",
     });
-  }
+  };
 
   return (
     <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
@@ -98,7 +170,9 @@ export default function Home() {
           Resume Tailor
         </h1>
         <p className="max-w-[800px] text-muted-foreground md:text-xl">
-          Instantly tailor your resume for any job. Our AI analyzes the job description and your experience to highlight your most relevant skills.
+          Instantly tailor your resume for any job. Our AI analyzes the job
+          description and your experience to highlight your most relevant
+          skills.
         </p>
       </div>
 
@@ -107,32 +181,77 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Your Details</CardTitle>
             <CardDescription>
-              Paste your resume and the job description below.
+              Provide your resume and the job description below.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                  control={form.control}
-                  name="resume"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex justify-between items-center">
-                        <FormLabel>Your Resume</FormLabel>
-                        <Button type="button" variant="link" size="sm" className="p-0 h-auto" onClick={handleUseSample}>Try with an example</Button>
-                      </div>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Paste your resume here..."
-                          className="min-h-[250px] resize-y"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <div className="flex justify-between items-center mb-2">
+                    <FormLabel>Your Resume</FormLabel>
+                    <TabsList className="grid w-full max-w-[220px] grid-cols-2 h-9">
+                      <TabsTrigger value="text">Text</TabsTrigger>
+                      <TabsTrigger value="file">PDF</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <TabsContent value="text">
+                    <FormField
+                      control={form.control}
+                      name="resume"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Paste your resume here..."
+                              className="min-h-[250px] resize-y"
+                              {...field}
+                            />
+                          </FormControl>
+                           <FormMessage />
+                           {form.formState.errors.resume && activeTab === 'file' && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
+                        </FormItem>
+                      )}
+                    />
+                     <Button type="button" variant="link" size="sm" className="p-0 h-auto mt-2" onClick={handleUseSample}>Try with an example</Button>
+                  </TabsContent>
+                  <TabsContent value="file">
+                     <FormField
+                        control={form.control}
+                        name="resumeFile"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                               <div className="flex items-center justify-center w-full">
+                                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted">
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                                            {form.watch('resumeFile')?.[0]?.name ? (
+                                                <p className="font-semibold text-primary">{form.watch('resumeFile')[0].name}</p>
+                                            ) : (
+                                                <>
+                                                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                                    <p className="text-xs text-muted-foreground">PDF (MAX. 4MB)</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf"
+                                            onChange={(e) => field.onChange(e.target.files)}
+                                            ref={field.ref}
+                                         />
+                                    </label>
+                                </div> 
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                  </TabsContent>
+                </Tabs>
+
                 <FormField
                   control={form.control}
                   name="jobDescription"
@@ -150,11 +269,7 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -177,7 +292,12 @@ export default function Home() {
                 </CardDescription>
               </div>
               {tailoredResume && !isLoading && (
-                <Button variant="outline" size="icon" onClick={handlePrint} className="no-print">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handlePrint}
+                  className="no-print"
+                >
                   <Download className="h-4 w-4" />
                   <span className="sr-only">Download PDF</span>
                 </Button>
@@ -198,21 +318,24 @@ export default function Home() {
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-4/6" />
                   </div>
-                   <div className="space-y-2 pt-4">
+                  <div className="space-y-2 pt-4">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-2/6" />
                   </div>
                 </div>
               ) : tailoredResume ? (
-                <div id="resume-output" className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap font-sans text-sm">
-                  {tailoredResume}
+                <div id="resume-output">
+                  <ResumeOutput {...tailoredResume} />
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg">
                   <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground">Ready to stand out?</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Ready to stand out?
+                  </h3>
                   <p className="text-muted-foreground">
-                    Fill in the form to get your professionally tailored resume.
+                    Fill in the form to get your professionally tailored
+                    resume.
                   </p>
                 </div>
               )}

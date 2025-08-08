@@ -2,6 +2,10 @@
   body * {
     visibility: hidden;
   }
+  
+  .resume-container, .resume-container * {
+    visibility: visible;
+  }
 
   #resume-output,
   #resume-output * {
@@ -13,7 +17,8 @@
     left: 0;
     top: 0;
     width: 100%;
-    padding: 1rem;
+    padding: 0;
+    margin: 0;
     color: #000;
   }
 
@@ -23,6 +28,6 @@
 
   @page {
     size: A4;
-    margin: 2cm;
+    margin: 1.5cm;
   }
 }
