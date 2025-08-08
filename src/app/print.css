@@ -22,6 +22,10 @@
   .break-inside-avoid {
     page-break-inside: avoid;
   }
+  
+  .page-break {
+    page-break-before: always;
+  }
 
   @page {
     size: A4;
@@ -33,5 +37,3 @@
     display: none;
     visibility: hidden;
 }
-
-      

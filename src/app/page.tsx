@@ -94,7 +94,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
   const [activeInputTab, setActiveInputTab] = React.useState("file");
-  const [activeDocumentTab, setActiveDocumentTab] = React.useState("resume");
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -375,26 +374,15 @@ export default function Home() {
                             <TabsTrigger value="insights">ATS Insights</TabsTrigger>
                         </TabsList>
                         <TabsContent value="documents">
-                            <Tabs defaultValue={activeDocumentTab} onValueChange={setActiveDocumentTab} className="w-full pt-4">
-                                <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="resume">Resume</TabsTrigger>
-                                    <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="resume">
-                                    <div className="pt-6">
-                                        <ResumeOutput {...generationResult} />
-                                    </div>
-                                </TabsContent>
-                                <TabsContent value="cover-letter">
-                                     <div className="pt-6">
-                                        <CoverLetterOutput {...generationResult} />
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
+                            <div className="pt-6">
+                                <ResumeOutput {...generationResult} />
+                                <div className="page-break" />
+                                <CoverLetterOutput {...generationResult} />
+                            </div>
                         </TabsContent>
                         <TabsContent value="insights">
                             <div className="no-print">
-                            <AtsInsightsOutput {...generationResult} />
+                                <AtsInsightsOutput {...generationResult} />
                             </div>
                         </TabsContent>
                     </Tabs>
@@ -418,12 +406,11 @@ export default function Home() {
     </div>
     {generationResult && (
         <div id="printable-area" className="only-print">
-            {activeDocumentTab === 'resume' && <ResumeOutput {...generationResult} />}
-            {activeDocumentTab === 'cover-letter' && <CoverLetterOutput {...generationResult} />}
+            <ResumeOutput {...generationResult} />
+            <div className="page-break" />
+            <CoverLetterOutput {...generationResult} />
         </div>
     )}
     </>
   );
 }
-
-      

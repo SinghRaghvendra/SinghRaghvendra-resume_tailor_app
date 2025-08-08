@@ -115,5 +115,3 @@ export const ResumeOutput = (props: ExtractAndMatchOutput) => {
     </div>
   );
 };
-
-      
