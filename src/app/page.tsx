@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Download, Loader2, Sparkles, Wand2, Upload, Lightbulb, FileText } from "lucide-react";
+import { Download, Loader2, Sparkles, Wand2, Upload, FileText, FileDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -89,12 +89,14 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type ActiveDocument = 'resume' | 'cover-letter';
 
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isDownloadingWord, setIsDownloadingWord] = React.useState(false);
+  const [isDownloading, setIsDownloading] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
   const [activeInputTab, setActiveInputTab] = React.useState("file");
+  const [activeDocument, setActiveDocument] = React.useState<ActiveDocument>('resume');
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -173,43 +175,50 @@ export default function Home() {
     window.print();
   };
   
-  const handleDownloadWord = async () => {
+  const handleDownload = async (format: 'pdf' | 'word') => {
     if (!generationResult) return;
-    setIsDownloadingWord(true);
+    
+    setIsDownloading(true);
+    
+    const printableAreaId = activeDocument === 'resume' ? 'resume-printable-area' : 'cover-letter-printable-area';
+    const filename = `${generationResult.name.replace(/\s+/g, '_')}_${activeDocument === 'resume' ? 'Resume' : 'Cover_Letter'}`;
+
     try {
-      const printableArea = document.getElementById('printable-area');
-      if (!printableArea) {
-        throw new Error('Printable area not found');
-      }
-      const htmlContent = printableArea.innerHTML;
-      
-      const base64 = await generateDocxAction(htmlContent);
+        if (format === 'pdf') {
+            handlePrint();
+        } else if (format === 'word') {
+            const printableArea = document.getElementById(printableAreaId);
+            if (!printableArea) {
+                throw new Error('Printable area not found');
+            }
+            const htmlContent = printableArea.innerHTML;
+            const base64 = await generateDocxAction(htmlContent);
 
-      const byteCharacters = atob(base64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      });
-      
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${generationResult.name.replace(/\s+/g, '_')}_Resume.docx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], {
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${filename}.docx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     } catch (error) {
-       toast({
-        variant: "destructive",
-        title: "Download Error",
-        description: error instanceof Error ? error.message : "Could not generate Word document.",
-      });
+        toast({
+            variant: "destructive",
+            title: "Download Error",
+            description: error instanceof Error ? error.message : `Could not generate ${format} document.`,
+        });
     } finally {
-        setIsDownloadingWord(false);
+        setIsDownloading(false);
     }
   }
 
@@ -378,23 +387,23 @@ export default function Home() {
                         Your AI-optimized resume and cover letter.
                     </CardDescription>
                     </div>
-                    <div className="flex items-center gap-2">
-                         <Button
+                     <div className="flex items-center gap-2">
+                        <Button
                             variant="outline"
                             size="sm"
-                            onClick={handleDownloadWord}
-                            disabled={!generationResult || isLoading || isDownloadingWord}
+                            onClick={() => handleDownload('word')}
+                            disabled={!generationResult || isLoading || isDownloading}
                             >
-                            {isDownloadingWord ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
+                            {isDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
                             Word
                         </Button>
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={handlePrint}
-                            disabled={!generationResult || isLoading}
+                            onClick={() => handleDownload('pdf')}
+                            disabled={!generationResult || isLoading || isDownloading}
                             >
-                            <Download className="h-4 w-4 mr-2" />
+                            {isDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
                             PDF
                         </Button>
                     </div>
@@ -421,21 +430,19 @@ export default function Home() {
                     </div>
                 ) : generationResult ? (
                      <Tabs defaultValue="documents" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="documents">Documents</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-3">
+                            <TabsTrigger value="resume" onClick={() => setActiveDocument('resume')}>Resume</TabsTrigger>
+                            <TabsTrigger value="cover-letter" onClick={() => setActiveDocument('cover-letter')}>Cover Letter</TabsTrigger>
                             <TabsTrigger value="insights">ATS Insights</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="documents">
-                            <div className="pt-6">
-                                <ResumeOutput {...generationResult} />
-                                <div className="page-break" />
-                                <CoverLetterOutput {...generationResult} />
-                            </div>
+                        <TabsContent value="resume" className="pt-6">
+                            <ResumeOutput {...generationResult} />
+                        </TabsContent>
+                         <TabsContent value="cover-letter" className="pt-6">
+                            <CoverLetterOutput {...generationResult} />
                         </TabsContent>
                         <TabsContent value="insights">
-                            <div className="no-print">
-                                <AtsInsightsOutput {...generationResult} />
-                            </div>
+                            <AtsInsightsOutput {...generationResult} />
                         </TabsContent>
                     </Tabs>
                 ) : (
@@ -457,11 +464,14 @@ export default function Home() {
         </main>
     </div>
     {generationResult && (
-        <div id="printable-area" className="only-print">
-            <ResumeOutput {...generationResult} />
-            <div className="page-break" />
-            <CoverLetterOutput {...generationResult} />
-        </div>
+        <>
+            <div id="resume-printable-area" className="only-print-resume">
+                <ResumeOutput {...generationResult} />
+            </div>
+            <div id="cover-letter-printable-area" className="only-print-cover-letter">
+                <CoverLetterOutput {...generationResult} />
+            </div>
+        </>
     )}
     </>
   );
