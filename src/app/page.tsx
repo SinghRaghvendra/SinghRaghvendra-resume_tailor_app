@@ -180,8 +180,9 @@ export default function Home() {
     
     setIsDownloading(true);
     
-    const printableAreaId = activeDocument === 'resume' ? 'resume-printable-area' : 'cover-letter-printable-area';
-    const filename = `${generationResult.name.replace(/\s+/g, '_')}_${activeDocument === 'resume' ? 'Resume' : 'Cover_Letter'}`;
+    // The printable area now contains both resume and cover letter separated by a page break
+    const printableAreaId = 'printable-area';
+    const filename = `${generationResult.name.replace(/\s+/g, '_')}_Application_Documents`;
 
     try {
         if (format === 'pdf') {
@@ -464,15 +465,14 @@ export default function Home() {
         </main>
     </div>
     {generationResult && (
-        <>
-            <div id="resume-printable-area" className="only-print-resume">
-                <ResumeOutput {...generationResult} />
-            </div>
-            <div id="cover-letter-printable-area" className="only-print-cover-letter">
-                <CoverLetterOutput {...generationResult} />
-            </div>
-        </>
+      <div id="printable-area" className="only-print">
+        <ResumeOutput {...generationResult} />
+        <div className="page-break"></div>
+        <CoverLetterOutput {...generationResult} />
+      </div>
     )}
     </>
   );
 }
+
+    

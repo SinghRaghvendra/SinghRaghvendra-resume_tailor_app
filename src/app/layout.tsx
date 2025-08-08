@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from 'react';
-import type { Metadata } from 'next';
 import './globals.css';
 import './print.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -11,26 +10,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  React.useEffect(() => {
-    const beforePrint = () => {
-      const resumeTab = document.querySelector('[data-state="active"][value="resume"]');
-      const coverLetterTab = document.querySelector('[data-state="active"][value="cover-letter"]');
-      
-      document.body.classList.remove('print-resume', 'print-cover-letter');
-
-      if (resumeTab) {
-        document.body.classList.add('print-resume');
-      } else if (coverLetterTab) {
-        document.body.classList.add('print-cover-letter');
-      }
-    };
-
-    window.addEventListener('beforeprint', beforePrint);
-
-    return () => {
-      window.removeEventListener('beforeprint', beforePrint);
-    };
-  }, []);
 
   return (
     <html lang="en">
@@ -48,3 +27,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+    

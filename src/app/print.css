@@ -1,16 +1,9 @@
 @media print {
-  body.print-resume .no-print,
-  body:not(.print-resume) .only-print-resume {
+  .no-print {
     display: none;
   }
   
-  body.print-cover-letter .no-print,
-  body:not(.print-cover-letter) .only-print-cover-letter {
-    display: none;
-  }
-
-  .only-print-resume,
-  .only-print-cover-letter {
+  .only-print {
     display: block !important;
     visibility: visible !important;
     position: absolute;
@@ -23,6 +16,10 @@
   .break-inside-avoid {
     page-break-inside: avoid;
   }
+  
+  .page-break {
+    page-break-before: always;
+  }
 
   @page {
     size: A4;
@@ -30,8 +27,9 @@
   }
 }
 
-.only-print-resume,
-.only-print-cover-letter {
+.only-print {
     display: none;
     visibility: hidden;
 }
+
+    
