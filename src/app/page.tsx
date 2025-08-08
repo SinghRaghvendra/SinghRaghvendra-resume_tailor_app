@@ -33,6 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { ResumeOutput } from "@/components/resume-output";
+import { CoverLetterOutput } from "@/components/cover-letter-output";
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
 const ACCEPTED_FILE_TYPES = ["application/pdf"];
@@ -80,8 +81,8 @@ let form: any;
 
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [tailoredResume, setTailoredResume] = React.useState<ExtractAndMatchOutput | null>(null);
-  const [activeTab, setActiveTab] = React.useState("text");
+  const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
+  const [activeInputTab, setActiveInputTab] = React.useState("text");
   const { toast } = useToast();
 
   form = useForm<FormValues>({
@@ -95,17 +96,17 @@ export default function Home() {
   });
   
   React.useEffect(() => {
-    form.setValue('activeTab', activeTab, { shouldValidate: true });
-  }, [activeTab]);
+    form.setValue('activeTab', activeInputTab, { shouldValidate: true });
+  }, [activeInputTab]);
 
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
-    setTailoredResume(null);
+    setGenerationResult(null);
     let resumeText = values.resume;
 
     try {
-      if (activeTab === 'file' && values.resumeFile?.[0]) {
+      if (activeInputTab === 'file' && values.resumeFile?.[0]) {
         try {
             const formData = new FormData();
             formData.append('file', values.resumeFile[0]);
@@ -135,7 +136,7 @@ export default function Home() {
         resumeText,
         values.jobDescription
       );
-      setTailoredResume(result);
+      setGenerationResult(result);
     } catch (error) {
       console.error(error);
       toast({
@@ -149,12 +150,20 @@ export default function Home() {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = (selector: string) => {
+    const printContent = document.querySelector(selector);
+    if (printContent) {
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = printContent.innerHTML;
+      window.print();
+      document.body.innerHTML = originalContents;
+      // we need to re-bind the form to the new dom
+      window.location.reload(); 
+    }
   };
-
+  
   const handleUseSample = () => {
-    setActiveTab("text");
+    setActiveInputTab("text");
     form.setValue("resume", SAMPLE_RESUME, { shouldValidate: true });
     toast({
       title: "Sample resume loaded",
@@ -170,7 +179,7 @@ export default function Home() {
           Resume Tailor
         </h1>
         <p className="max-w-[800px] text-muted-foreground md:text-xl">
-          Instantly tailor your resume for any job. Our AI analyzes the job
+          Instantly tailor your resume and generate a cover letter for any job. Our AI analyzes the job
           description and your experience to highlight your most relevant
           skills.
         </p>
@@ -190,7 +199,7 @@ export default function Home() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8"
               >
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <Tabs value={activeInputTab} onValueChange={setActiveInputTab} className="w-full">
                   <div className="flex justify-between items-center mb-2">
                     <FormLabel>Your Resume</FormLabel>
                     <TabsList className="grid w-full max-w-[220px] grid-cols-2 h-9">
@@ -212,7 +221,7 @@ export default function Home() {
                             />
                           </FormControl>
                            <FormMessage />
-                           {form.formState.errors.resume && activeTab === 'file' && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
+                           {form.formState.errors.resume && activeInputTab === 'file' && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
                         </FormItem>
                       )}
                     />
@@ -275,7 +284,7 @@ export default function Home() {
                   ) : (
                     <Wand2 className="mr-2 h-4 w-4" />
                   )}
-                  Tailor Resume
+                  Tailor Documents
                 </Button>
               </form>
             </Form>
@@ -286,22 +295,11 @@ export default function Home() {
           <Card className="sticky top-8">
             <CardHeader className="flex flex-row items-center justify-between">
               <div className="space-y-1">
-                <CardTitle>Tailored Resume</CardTitle>
+                <CardTitle>Your Tailored Documents</CardTitle>
                 <CardDescription>
-                  Your AI-optimized resume will appear here.
+                  Your AI-optimized resume and cover letter.
                 </CardDescription>
               </div>
-              {tailoredResume && !isLoading && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handlePrint}
-                  className="no-print"
-                >
-                  <Download className="h-4 w-4" />
-                  <span className="sr-only">Download PDF</span>
-                </Button>
-              )}
             </CardHeader>
             <CardContent className="min-h-[500px]">
               {isLoading ? (
@@ -323,10 +321,45 @@ export default function Home() {
                     <Skeleton className="h-4 w-2/6" />
                   </div>
                 </div>
-              ) : tailoredResume ? (
-                <div id="resume-output">
-                  <ResumeOutput {...tailoredResume} />
-                </div>
+              ) : generationResult ? (
+                <Tabs defaultValue="resume" className="w-full">
+                  <div className="flex justify-between items-center mb-4">
+                    <TabsList>
+                      <TabsTrigger value="resume">Resume</TabsTrigger>
+                      <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                    </TabsList>
+                     <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePrint('#resume-output')}
+                            className="no-print"
+                            >
+                            <Download className="h-4 w-4 mr-2" />
+                            Resume
+                        </Button>
+                         <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePrint('#cover-letter-output')}
+                            className="no-print"
+                            >
+                            <Download className="h-4 w-4 mr-2" />
+                            Letter
+                        </Button>
+                    </div>
+                  </div>
+                  <TabsContent value="resume">
+                     <div id="resume-output" className="printable">
+                        <ResumeOutput {...generationResult} />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="cover-letter">
+                    <div id="cover-letter-output" className="printable">
+                        <CoverLetterOutput {...generationResult} />
+                    </div>
+                  </TabsContent>
+                </Tabs>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg">
                   <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
@@ -335,7 +368,7 @@ export default function Home() {
                   </h3>
                   <p className="text-muted-foreground">
                     Fill in the form to get your professionally tailored
-                    resume.
+                    documents.
                   </p>
                 </div>
               )}

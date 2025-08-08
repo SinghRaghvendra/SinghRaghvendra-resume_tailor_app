@@ -2,7 +2,7 @@
 
 /**
  * @fileOverview Extracts information from a resume and job description, matches skills and experience,
- * and generates a tailored resume.
+ * and generates a tailored resume and cover letter.
  *
  * - extractAndMatch - A function that orchestrates the resume tailoring process.
  * - ExtractAndMatchInput - The input type for the extractAndMatch function.
@@ -21,11 +21,6 @@ const ExtractAndMatchInputSchema = z.object({
     .describe('The text content of the job description.'),
 });
 export type ExtractAndMatchInput = z.infer<typeof ExtractAndMatchInputSchema>;
-
-const ResumeSectionSchema = z.object({
-  title: z.string(),
-  content: z.string(),
-});
 
 const ExperienceItemSchema = z.object({
   role: z.string(),
@@ -53,6 +48,7 @@ const ExtractAndMatchOutputSchema = z.object({
   education: z.array(EducationItemSchema),
   certifications: z.array(z.string()),
   hobbies: z.array(z.string()),
+  coverLetter: z.string().describe('A tailored cover letter for the job application.'),
 });
 export type ExtractAndMatchOutput = z.infer<typeof ExtractAndMatchOutputSchema>;
 
@@ -64,9 +60,9 @@ const prompt = ai.definePrompt({
   name: 'extractAndMatchPrompt',
   input: {schema: ExtractAndMatchInputSchema},
   output: {schema: ExtractAndMatchOutputSchema},
-  prompt: `You are an expert resume tailor with deep knowledge of Applicant Tracking Systems (ATS). Your task is to parse the provided resume, tailor it to a specific job description aiming for a 90% match for skills and keywords, and return it as a structured JSON object.
+  prompt: `You are an expert resume tailor and career coach with deep knowledge of Applicant Tracking Systems (ATS). Your task is to parse the provided resume, tailor it to a specific job description aiming for a 90% match for skills and keywords, generate a compelling cover letter, and return everything as a structured JSON object.
 
-Your primary goal is to strategically incorporate relevant skills and keywords from the job description into the resume. You must analyze the job description to identify the most critical skills, qualifications, and experiences the employer is looking for. Then, you will seamlessly integrate these into the resume, particularly in the 'skills' and 'experience' sections.
+Your primary goal is to strategically incorporate relevant skills and keywords from the job description into the resume and cover letter. You must analyze the job description to identify the most critical skills, qualifications, and experiences.
 
 Resume:
 {{{resumeText}}}
@@ -75,12 +71,13 @@ Job Description:
 {{{jobDescriptionText}}}
 
 Instructions:
-1.  **Parse Resume:** Accurately parse the entire input resume into its constituent parts: name, contact info, objective, skills, experience, education, certifications, and hobbies.
+1.  **Parse Resume:** Accurately parse the entire input resume into its constituent parts.
 2.  **Analyze and Extract Keywords:** Carefully read the job description and extract all relevant skills, technologies, and action verbs.
-3.  **Skill Matching:** Compare the extracted keywords with the skills already present in the resume. Add skills from the job description that are relevant to the candidate's experience but are missing from their resume. Populate the 'skills' array in the output.
-4.  **Tailor Experience:** Rephrase bullet points in the 'experience' section to reflect the language and priorities of the job description. Use action verbs and keywords from the job description where appropriate. Each bullet point should be a separate string in the 'description' array for each experience item.
-5.  **Maintain Structure and Tone:** Do not invent new experiences. Creatively rephrase existing ones to align with the target role. The final output must be professional and compelling.
-6.  **Format Output:** Return the complete, tailored resume as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
+3.  **Skill Matching & Culling:** Compare extracted keywords with the skills in the resume. Add relevant skills from the job description. **Crucially, remove any skills, experiences, or certifications from the original resume that do not align with the job description to ensure the final document is highly focused and relevant.**
+4.  **Tailor Experience:** Rephrase bullet points in the 'experience' section to reflect the language and priorities of the job description. Use action verbs and keywords from the job description. Each bullet point should be a separate string in the 'description' array.
+5.  **Generate Cover Letter:** Write a professional and compelling cover letter. The cover letter should be tailored to the job description, highlight the candidate's most relevant qualifications from the tailored resume, and express genuine interest in the role and company. The tone should be professional yet personable. The output should be a single string with markdown for formatting (e.g., newlines for paragraphs).
+6.  **Maintain Structure and Tone:** Do not invent new experiences. The final output must be professional, compelling, and free of irrelevant details.
+7.  **Format Output:** Return the complete, tailored resume and the cover letter as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
 `,
 });
 

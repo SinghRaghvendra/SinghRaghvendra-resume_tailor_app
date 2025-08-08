@@ -3,16 +3,11 @@
     visibility: hidden;
   }
   
-  .resume-container, .resume-container * {
+  .printable, .printable * {
     visibility: visible;
   }
 
-  #resume-output,
-  #resume-output * {
-    visibility: visible;
-  }
-
-  #resume-output {
+  .printable {
     position: absolute;
     left: 0;
     top: 0;
