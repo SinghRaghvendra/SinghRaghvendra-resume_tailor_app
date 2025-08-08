@@ -16,6 +16,8 @@ export default function RootLayout({
       const resumeTab = document.querySelector('[data-state="active"][value="resume"]');
       const coverLetterTab = document.querySelector('[data-state="active"][value="cover-letter"]');
       
+      document.body.classList.remove('print-resume', 'print-cover-letter');
+
       if (resumeTab) {
         document.body.classList.add('print-resume');
       } else if (coverLetterTab) {
@@ -23,16 +25,10 @@ export default function RootLayout({
       }
     };
 
-    const afterPrint = () => {
-      document.body.classList.remove('print-resume', 'print-cover-letter');
-    };
-
     window.addEventListener('beforeprint', beforePrint);
-    window.addEventListener('afterprint', afterPrint);
 
     return () => {
       window.removeEventListener('beforeprint', beforePrint);
-      window.removeEventListener('afterprint', afterPrint);
     };
   }, []);
 

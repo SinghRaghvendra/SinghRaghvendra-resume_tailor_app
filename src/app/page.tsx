@@ -429,10 +429,10 @@ export default function Home() {
                     </div>
                     </div>
                 ) : generationResult ? (
-                     <Tabs defaultValue="documents" className="w-full">
+                     <Tabs defaultValue="resume" onValueChange={(value) => setActiveDocument(value as ActiveDocument)} className="w-full">
                         <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger value="resume" onClick={() => setActiveDocument('resume')}>Resume</TabsTrigger>
-                            <TabsTrigger value="cover-letter" onClick={() => setActiveDocument('cover-letter')}>Cover Letter</TabsTrigger>
+                            <TabsTrigger value="resume">Resume</TabsTrigger>
+                            <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
                             <TabsTrigger value="insights">ATS Insights</TabsTrigger>
                         </TabsList>
                         <TabsContent value="resume" className="pt-6">

@@ -1,20 +1,22 @@
 @media print {
-  body.print-resume > *:not(.only-print-resume) {
+  body.print-resume .no-print,
+  body:not(.print-resume) .only-print-resume {
     display: none;
   }
-  body.print-cover-letter > *:not(.only-print-cover-letter) {
+  
+  body.print-cover-letter .no-print,
+  body:not(.print-cover-letter) .only-print-cover-letter {
     display: none;
   }
 
-  .no-print {
-    display: none !important;
-  }
-  
   .only-print-resume,
   .only-print-cover-letter {
     display: block !important;
     visibility: visible !important;
-    position: relative;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
     color: #000;
   }
 
