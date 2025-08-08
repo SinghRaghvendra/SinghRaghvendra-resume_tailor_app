@@ -19,6 +19,7 @@ const ExtractAndMatchInputSchema = z.object({
   jobDescriptionText: z
     .string()
     .describe('The text content of the job description.'),
+  modificationPrompt: z.string().optional().describe('Additional instructions from the user to modify the output.'),
 });
 export type ExtractAndMatchInput = z.infer<typeof ExtractAndMatchInputSchema>;
 
@@ -78,6 +79,12 @@ Instructions:
 5.  **Generate Cover Letter:** Write a professional and compelling cover letter. The cover letter should be tailored to the job description, highlight the candidate's most relevant qualifications from the tailored resume, and express genuine interest in the role and company. The tone should be professional yet personable. The output should be a single string with markdown for formatting (e.g., newlines for paragraphs).
 6.  **Rewrite for Impact:** Review and rewrite the entire resume for clarity, impact, and professional tone. The final output must be polished and free of grammatical errors.
 7.  **Format Output:** Return the complete, tailored resume and the cover letter as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
+
+{{#if modificationPrompt}}
+**User Modifications:**
+In addition to the above, please apply the following modifications based on the user's request:
+{{{modificationPrompt}}}
+{{/if}}
 `,
 });
 

@@ -44,6 +44,7 @@ const formSchema = z.object({
     .string()
     .min(50, "Please provide a more detailed job description.")
     .max(10000, "Job description is too long."),
+  modificationPrompt: z.string().optional(),
   resumeFile: z
     .any()
     .optional(),
@@ -90,6 +91,7 @@ export default function Home() {
     defaultValues: {
       resume: "",
       jobDescription: "",
+      modificationPrompt: "",
       resumeFile: undefined,
     },
     mode: 'onChange',
@@ -134,7 +136,8 @@ export default function Home() {
 
       const result = await generateTailoredResumeAction(
         resumeText,
-        values.jobDescription
+        values.jobDescription,
+        values.modificationPrompt
       );
       setGenerationResult(result);
     } catch (error) {
@@ -274,6 +277,26 @@ export default function Home() {
                           {...field}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="modificationPrompt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Additional Instructions (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="e.g., 'Make my resume more formal', 'Emphasize my leadership skills'"
+                          className="min-h-[100px] resize-y"
+                          {...field}
+                        />
+                      </FormControl>
+                       <FormDescription>
+                        Provide any specific instructions to customize your documents.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

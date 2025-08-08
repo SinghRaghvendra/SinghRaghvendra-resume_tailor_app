@@ -7,15 +7,18 @@ import pdf from "pdf-parse/lib/pdf-parse";
 const actionSchema = z.object({
   resumeText: z.string().min(1, "Resume text is required."),
   jobDescriptionText: z.string().min(1, "Job description text is required."),
+  modificationPrompt: z.string().optional(),
 });
 
 export async function generateTailoredResumeAction(
   resumeText: string,
-  jobDescriptionText: string
+  jobDescriptionText: string,
+  modificationPrompt?: string,
 ): Promise<ExtractAndMatchOutput> {
   const validation = actionSchema.safeParse({
     resumeText,
     jobDescriptionText,
+    modificationPrompt,
   });
 
   if (!validation.success) {
@@ -26,6 +29,7 @@ export async function generateTailoredResumeAction(
     const result = await extractAndMatch({
       resumeText,
       jobDescriptionText,
+      modificationPrompt,
     });
 
     if (!result) {
