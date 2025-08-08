@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, MapPin, Linkedin, Dot, Link } from "lucide-react";
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <section className="mb-6 break-inside-avoid">
+  <section className="mb-4 break-inside-avoid">
     <h2 className="text-sm font-bold text-primary tracking-widest uppercase bg-primary/10 p-2 rounded-sm mb-3">{title}</h2>
     <div className="text-sm">{children}</div>
   </section>
