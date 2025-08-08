@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Download, Loader2, Sparkles, Wand2, Upload, Lightbulb } from "lucide-react";
+import { Download, Loader2, Sparkles, Wand2, Upload, Lightbulb, FileText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { generateTailoredResumeAction, extractTextFromPdfAction } from "@/app/actions";
+import { generateTailoredResumeAction, extractTextFromPdfAction, generateDocxAction } from "@/app/actions";
 import { SAMPLE_RESUME } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/icons";
@@ -92,6 +92,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isDownloadingWord, setIsDownloadingWord] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
   const [activeInputTab, setActiveInputTab] = React.useState("file");
   const { toast } = useToast();
@@ -172,6 +173,46 @@ export default function Home() {
     window.print();
   };
   
+  const handleDownloadWord = async () => {
+    if (!generationResult) return;
+    setIsDownloadingWord(true);
+    try {
+      const printableArea = document.getElementById('printable-area');
+      if (!printableArea) {
+        throw new Error('Printable area not found');
+      }
+      const htmlContent = printableArea.innerHTML;
+      
+      const base64 = await generateDocxAction(htmlContent);
+
+      const byteCharacters = atob(base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      });
+      
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${generationResult.name.replace(/\s+/g, '_')}_Resume.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Download Error",
+        description: error instanceof Error ? error.message : "Could not generate Word document.",
+      });
+    } finally {
+        setIsDownloadingWord(false);
+    }
+  }
+
   const handleUseSample = () => {
     setActiveInputTab("text");
     form.setValue("resume", SAMPLE_RESUME, { shouldValidate: true });
@@ -337,15 +378,26 @@ export default function Home() {
                         Your AI-optimized resume and cover letter.
                     </CardDescription>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handlePrint}
-                        disabled={!generationResult || isLoading}
-                        >
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
-                    </Button>
+                    <div className="flex items-center gap-2">
+                         <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDownloadWord}
+                            disabled={!generationResult || isLoading || isDownloadingWord}
+                            >
+                            {isDownloadingWord ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
+                            Word
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handlePrint}
+                            disabled={!generationResult || isLoading}
+                            >
+                            <Download className="h-4 w-4 mr-2" />
+                            PDF
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent className="min-h-[500px]">
                 {isLoading ? (
