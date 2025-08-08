@@ -1,33 +1,41 @@
 @media print {
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: #fff;
+  body * {
+    visibility: hidden;
   }
   
   .no-print {
     display: none !important;
   }
   
-  #printable-area {
-    display: block;
+  #printable-area, #printable-area * {
     visibility: visible;
+  }
+  
+  #printable-area {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
+    height: auto;
     color: #000;
   }
 
-  main {
-    padding: 0;
+  .only-print {
+      display: block;
+      visibility: visible;
+  }
+
+  .break-after-page {
+    page-break-after: always;
   }
 
   @page {
     size: A4;
     margin: 1.5cm;
   }
+}
+
+.only-print {
+    display: none;
+    visibility: hidden;
 }

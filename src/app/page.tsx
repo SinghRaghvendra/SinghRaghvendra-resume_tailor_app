@@ -191,7 +191,8 @@ export default function Home() {
   }
 
   return (
-    <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
+    <>
+    <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16 no-print">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
         <Logo className="h-14 w-14 text-primary" />
         <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
@@ -205,7 +206,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-12">
-        <Card className="w-full no-print">
+        <Card className="w-full">
           <CardHeader>
             <CardTitle>Your Details</CardTitle>
             <CardDescription>
@@ -329,7 +330,7 @@ export default function Home() {
 
         <div className="mt-8 lg:mt-0">
           <Card className="sticky top-8">
-             <CardHeader className="flex flex-row items-center justify-between no-print">
+             <CardHeader className="flex flex-row items-center justify-between">
                 <div className="space-y-1">
                   <CardTitle>Your Tailored Documents</CardTitle>
                   <CardDescription>
@@ -368,12 +369,12 @@ export default function Home() {
                 </div>
               ) : generationResult ? (
                  <Tabs defaultValue="documents" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 no-print">
+                  <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="documents">Documents</TabsTrigger>
                     <TabsTrigger value="insights">ATS Insights</TabsTrigger>
                   </TabsList>
                   <TabsContent value="documents">
-                     <div id="printable-area" className="pt-6">
+                     <div className="pt-6">
                         <ResumeOutput {...generationResult} />
                         <div className="p-8"><Separator /></div>
                         <CoverLetterOutput {...generationResult} />
@@ -402,5 +403,13 @@ export default function Home() {
         </div>
       </div>
     </main>
+    {generationResult && (
+        <div id="printable-area" className="only-print">
+            <ResumeOutput {...generationResult} />
+            <div className="break-after-page"></div>
+            <CoverLetterOutput {...generationResult} />
+        </div>
+    )}
+    </>
   );
 }
