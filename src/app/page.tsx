@@ -35,7 +35,6 @@ import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { ResumeOutput } from "@/components/resume-output";
 import { CoverLetterOutput } from "@/components/cover-letter-output";
 import { AtsInsightsOutput } from "@/components/ats-insights-output";
-import { Separator } from "@/components/ui/separator";
 
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
@@ -95,6 +94,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
   const [activeInputTab, setActiveInputTab] = React.useState("file");
+  const [activeDocumentTab, setActiveDocumentTab] = React.useState("resume");
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -369,23 +369,34 @@ export default function Home() {
                     </div>
                     </div>
                 ) : generationResult ? (
-                    <Tabs defaultValue="documents" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="documents">Documents</TabsTrigger>
-                        <TabsTrigger value="insights">ATS Insights</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="documents">
-                        <div className="pt-6">
-                            <ResumeOutput {...generationResult} />
-                            <div className="p-8"><Separator /></div>
-                            <CoverLetterOutput {...generationResult} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="insights">
-                        <div className="no-print">
-                        <AtsInsightsOutput {...generationResult} />
-                        </div>
-                    </TabsContent>
+                     <Tabs defaultValue="documents" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="documents">Documents</TabsTrigger>
+                            <TabsTrigger value="insights">ATS Insights</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="documents">
+                            <Tabs defaultValue={activeDocumentTab} onValueChange={setActiveDocumentTab} className="w-full pt-4">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="resume">Resume</TabsTrigger>
+                                    <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="resume">
+                                    <div className="pt-6">
+                                        <ResumeOutput {...generationResult} />
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value="cover-letter">
+                                     <div className="pt-6">
+                                        <CoverLetterOutput {...generationResult} />
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+                        </TabsContent>
+                        <TabsContent value="insights">
+                            <div className="no-print">
+                            <AtsInsightsOutput {...generationResult} />
+                            </div>
+                        </TabsContent>
                     </Tabs>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg mt-6">
@@ -407,11 +418,12 @@ export default function Home() {
     </div>
     {generationResult && (
         <div id="printable-area" className="only-print">
-            <ResumeOutput {...generationResult} />
-            <div className="break-after-page"></div>
-            <CoverLetterOutput {...generationResult} />
+            {activeDocumentTab === 'resume' && <ResumeOutput {...generationResult} />}
+            {activeDocumentTab === 'cover-letter' && <CoverLetterOutput {...generationResult} />}
         </div>
     )}
     </>
   );
 }
+
+      

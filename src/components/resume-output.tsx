@@ -1,6 +1,5 @@
 import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
-import { Separator } from "@/components/ui/separator";
-import { Mail, Phone, MapPin, Linkedin, Dot, Link } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Link } from "lucide-react";
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="mb-4 break-inside-avoid">
@@ -12,7 +11,7 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
 export const ResumeOutput = (props: ExtractAndMatchOutput) => {
   return (
     <div className="bg-white text-gray-800 p-8 font-sans text-sm">
-       <header className="mb-8">
+       <header className="mb-6">
         <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-2">{props.name}</h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <a href={`tel:${props.phone}`} className="flex items-center gap-1.5 hover:text-primary"><Phone size={12} />{props.phone}</a>
@@ -116,3 +115,5 @@ export const ResumeOutput = (props: ExtractAndMatchOutput) => {
     </div>
   );
 };
+
+      
