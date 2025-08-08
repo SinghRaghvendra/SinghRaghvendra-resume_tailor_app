@@ -49,13 +49,14 @@ const formSchema = z.object({
     .max(10000, "Job description is too long."),
   modificationPrompt: z.string().optional(),
   resumeFile: z
-    .any()
+    .custom<FileList>()
     .optional(),
 }).refine(data => {
-    if (form?.getValues('activeTab') === 'text') {
+    const activeTab = form?.getValues('activeTab');
+    if (activeTab === 'text') {
         return !!data.resume && data.resume.length > 0;
     }
-    if (form?.getValues('activeTab') === 'file') {
+    if (activeTab === 'file') {
         return !!data.resumeFile && data.resumeFile.length > 0;
     }
     return false;
@@ -63,7 +64,8 @@ const formSchema = z.object({
     message: "Please upload a resume or paste it as text.",
     path: ["resume"],
 }).refine(data => {
-    if (form?.getValues('activeTab') === 'file' && data.resumeFile) {
+    const activeTab = form?.getValues('activeTab');
+    if (activeTab === 'file' && data.resumeFile) {
         for (let i = 0; i < data.resumeFile.length; i++) {
             if (data.resumeFile[i].size > MAX_FILE_SIZE) {
                 return false;
@@ -75,7 +77,8 @@ const formSchema = z.object({
     message: `Max file size is 4MB per file.`,
     path: ["resumeFile"],
 }).refine(data => {
-    if (form?.getValues('activeTab') === 'file' && data.resumeFile) {
+    const activeTab = form?.getValues('activeTab');
+    if (activeTab === 'file' && data.resumeFile) {
          for (let i = 0; i < data.resumeFile.length; i++) {
             if (!ACCEPTED_FILE_TYPES.includes(data.resumeFile[i].type)) {
                 return false;
@@ -103,7 +106,6 @@ export default function Home() {
       resume: "",
       jobDescription: "",
       modificationPrompt: "",
-      resumeFile: undefined,
     },
     mode: 'onChange',
   });
@@ -119,12 +121,12 @@ export default function Home() {
     let resumeText = values.resume;
 
     try {
-      if (activeInputTab === 'file' && values.resumeFile?.[0]) {
+      if (activeInputTab === 'file' && values.resumeFile?.length) {
         try {
             const formData = new FormData();
-            for (let i = 0; i < values.resumeFile.length; i++) {
-              formData.append('file', values.resumeFile[i]);
-            }
+            Array.from(values.resumeFile).forEach(file => {
+              formData.append('file', file);
+            });
             resumeText = await extractTextFromPdfAction(formData);
         } catch (error) {
           toast({
@@ -227,14 +229,14 @@ export default function Home() {
                      <FormField
                         control={form.control}
                         name="resumeFile"
-                        render={({ field }) => (
+                        render={({ field: { onChange, ...fieldProps } }) => (
                           <FormItem>
                             <FormControl>
                                <div className="flex items-center justify-center w-full">
                                     <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted">
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                             <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                                            {form.watch('resumeFile')?.[0]?.name ? (
+                                            {renderFileNames() ? (
                                                 <p className="font-semibold text-primary px-2 text-center">{renderFileNames()}</p>
                                             ) : (
                                                 <>
@@ -244,8 +246,8 @@ export default function Home() {
                                             )}
                                         </div>
                                         <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf" multiple
-                                            onChange={(e) => field.onChange(e.target.files)}
-                                            ref={field.ref}
+                                            {...fieldProps}
+                                            onChange={(e) => onChange(e.target.files)}
                                          />
                                     </label>
                                 </div> 
