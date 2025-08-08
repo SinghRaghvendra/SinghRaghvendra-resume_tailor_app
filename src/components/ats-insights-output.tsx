@@ -1,6 +1,7 @@
 import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, AlertTriangle, Lightbulb } from "lucide-react";
+import { CheckCircle2, TrendingUp, Lightbulb, BadgeCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export const AtsInsightsOutput = (props: ExtractAndMatchOutput) => {
   const getScoreColor = (score: number) => {
@@ -8,6 +9,14 @@ export const AtsInsightsOutput = (props: ExtractAndMatchOutput) => {
     if (score >= 70) return "text-yellow-600";
     return "text-red-600";
   };
+  
+  const getScoreBgColor = (score: number) => {
+    if (score >= 85) return "bg-green-600";
+    if (score >= 70) return "bg-yellow-600";
+    return "bg-red-600";
+  };
+
+  const scoreDifference = props.tailoredAtsScore - props.initialAtsScore;
 
   return (
     <div className="bg-white text-gray-800 p-8 font-sans text-sm">
@@ -16,17 +25,46 @@ export const AtsInsightsOutput = (props: ExtractAndMatchOutput) => {
             <Lightbulb className="mr-2 h-5 w-5" />
             ATS & Improvement Insights
         </h2>
-        <div className="space-y-4">
-            <div>
-                <div className="flex justify-between items-center mb-1">
-                    <p className="font-semibold">ATS Match Score</p>
-                    <p className={`font-bold text-2xl ${getScoreColor(props.atsScore)}`}>{props.atsScore}%</p>
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <div>
+                    <div className="flex justify-between items-center mb-1">
+                        <p className="font-semibold">Initial ATS Score</p>
+                        <p className={`font-bold text-2xl ${getScoreColor(props.initialAtsScore)}`}>{props.initialAtsScore}%</p>
+                    </div>
+                    <Progress value={props.initialAtsScore} className="h-2" indicatorClassName={getScoreBgColor(props.initialAtsScore)} />
                 </div>
-                <Progress value={props.atsScore} className="h-2" />
-                 <p className="text-xs text-muted-foreground mt-1">
-                    This score estimates how well your resume aligns with the job description keywords.
-                </p>
+                 <div>
+                    <div className="flex justify-between items-center mb-1">
+                        <p className="font-semibold">Tailored ATS Score</p>
+                        <p className={`font-bold text-2xl ${getScoreColor(props.tailoredAtsScore)}`}>{props.tailoredAtsScore}%</p>
+                    </div>
+                    <Progress value={props.tailoredAtsScore} className="h-2" indicatorClassName={getScoreBgColor(props.tailoredAtsScore)} />
+                </div>
             </div>
+            {scoreDifference > 0 && (
+                 <div className="flex items-center justify-center text-center bg-green-50 p-3 rounded-lg">
+                    <TrendingUp className="h-5 w-5 mr-2 text-green-600"/>
+                    <p className="text-sm font-semibold text-green-700">Your tailored resume scored {scoreDifference} points higher!</p>
+                 </div>
+            )}
+             <p className="text-xs text-muted-foreground text-center">
+                This score estimates how well your resume aligns with the job description keywords.
+            </p>
+
+            {props.matchedKeywords?.length > 0 && (
+                <div>
+                    <h3 className="font-semibold mb-2 mt-4 flex items-center">
+                        <BadgeCheck className="mr-2 h-5 w-5 text-primary" />
+                        Top Matched Keywords
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                        {props.matchedKeywords.map((keyword) => (
+                        <Badge key={keyword} variant="secondary" className="font-normal">{keyword}</Badge>
+                        ))}
+                    </div>
+                </div>
+            )}
           
             <div>
                  <h3 className="font-semibold mb-2 mt-4">Improvement Suggestions:</h3>

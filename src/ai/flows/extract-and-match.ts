@@ -58,7 +58,9 @@ const ExtractAndMatchOutputSchema = z.object({
   certifications: z.array(z.string()),
   hobbies: z.array(z.string()),
   coverLetter: z.string().describe('A tailored cover letter for the job application.'),
-  atsScore: z.number().describe('An estimated ATS match score percentage (e.g., 85 for 85%).'),
+  initialAtsScore: z.number().describe('An estimated ATS match score percentage for the original resume.'),
+  tailoredAtsScore: z.number().describe('An estimated ATS match score percentage for the tailored resume.'),
+  matchedKeywords: z.array(z.string()).describe('A list of the top keywords found in both the resume and job description.'),
   improvementSuggestions: z.array(z.string()).describe('A list of actionable suggestions to improve the resume and cover letter.'),
 });
 export type ExtractAndMatchOutput = z.infer<typeof ExtractAndMatchOutputSchema>;
@@ -82,15 +84,18 @@ Job Description:
 {{{jobDescriptionText}}}
 
 Instructions:
-1.  **Parse Resume:** Accurately parse the entire input resume into its constituent parts. Treat the provided resume text as a single, consolidated document.
-2.  **Deep Job Description Analysis:** Identify the most important keywords, required skills (hard and soft), key responsibilities, and qualifications from the job description. Go beyond surface-level matching.
-3.  **Skill Matching & Culling:** Compare the job's required skills with the candidate's skills. Add relevant skills from the job description that the candidate likely possesses but hasn't listed. **Crucially, include only the top 10 most relevant skills for the job to ensure focus.**
-4.  **Tailor Experience for Impact:** Review all work experience from the original resume. **Do not remove any work experience entries.** For each role, rephrase the bullet points to directly address the requirements of the job description. Use powerful action verbs and quantify achievements with metrics wherever possible (e.g., "Increased sales by 15%" or "Reduced processing time by 25%"). The goal is to highlight transferable skills and align the candidate's entire history with the target role, making it short, simple, informative, and compelling. Ensure each bullet point is a separate string in the 'description' array.
-5.  **Create Portfolio Section:** Identify and extract any projects mentioned in the resume. Format them for a new "Portfolio" section to showcase practical experience. If no projects are mentioned, leave this section empty.
-6.  **Generate a Standout Cover Letter:** Write a professional, concise, and compelling cover letter. It must be tailored to the job description and company. It should highlight the candidate's most relevant qualifications from the tailored resume and express genuine, well-researched interest in the role and company. The output should be a single string with markdown for formatting (e.g., newlines for paragraphs).
-7.  **Rewrite for Excellence:** Review and rewrite the entire resume for clarity, impact, and a professional tone. The final output must be polished, free of grammatical errors, and formatted to be easily readable by both ATS and humans. The final resume should not exceed a maximum of 3 pages.
-8.  **ATS Score & Actionable Suggestions:** Calculate an estimated ATS match score as a percentage. Provide a list of specific, actionable suggestions for what the user could do to further improve their resume and cover letter to increase their chances of getting an interview.
-9.  **Format Output:** Return the complete, tailored resume, the cover letter, ATS score, and suggestions as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
+1.  **Initial Analysis:** First, analyze the original resume and the job description.
+    a.  Calculate an initial ATS score based on how well the original resume matches the job description.
+    b.  Identify and list the top keywords that are common to both the original resume and the job description.
+2.  **Parse Resume:** Accurately parse the entire input resume into its constituent parts. Treat the provided resume text as a single, consolidated document.
+3.  **Deep Job Description Analysis:** Identify the most important keywords, required skills (hard and soft), key responsibilities, and qualifications from the job description. Go beyond surface-level matching.
+4.  **Skill Matching & Culling:** Compare the job's required skills with the candidate's skills. Add relevant skills from the job description that the candidate likely possesses but hasn't listed. **Crucially, include only the top 10 most relevant skills for the job to ensure focus.**
+5.  **Tailor Experience for Impact:** Review all work experience from the original resume. **Do not remove any work experience entries.** For each role, rephrase the bullet points to directly address the requirements of the job description. Use powerful action verbs and quantify achievements with metrics wherever possible (e.g., "Increased sales by 15%" or "Reduced processing time by 25%"). The goal is to highlight transferable skills and align the candidate's entire history with the target role, making it short, simple, informative, and compelling. Ensure each bullet point is a separate string in the 'description' array.
+6.  **Create Portfolio Section:** Identify and extract any projects mentioned in the resume. Format them for a new "Portfolio" section to showcase practical experience. If no projects are mentioned, leave this section empty.
+7.  **Generate a Standout Cover Letter:** Write a professional, concise, and compelling cover letter. It must be tailored to the job description and company. It should highlight the candidate's most relevant qualifications from the tailored resume and express genuine, well-researched interest in the role and company. The output should be a single string with markdown for formatting (e.g., newlines for paragraphs).
+8.  **Rewrite for Excellence:** Review and rewrite the entire resume for clarity, impact, and a professional tone. The final output must be polished, free of grammatical errors, and formatted to be easily readable by both ATS and humans. The final resume should not exceed a maximum of 3 pages.
+9.  **Final ATS Score & Actionable Suggestions:** Calculate a new, improved ATS match score for the tailored resume. Provide a list of specific, actionable suggestions for what the user could do to further improve their resume and cover letter to increase their chances of getting an interview.
+10. **Format Output:** Return the complete, tailored resume, the cover letter, initial and tailored ATS scores, matched keywords, and suggestions as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
 
 {{#if modificationPrompt}}
 **User Modifications:**
