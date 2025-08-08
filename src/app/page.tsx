@@ -42,6 +42,7 @@ const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
 const ACCEPTED_FILE_TYPES = ["application/pdf"];
 
 const formSchema = z.object({
+  activeTab: z.string(),
   resume: z.string().optional(),
   jobDescription: z
     .string()
@@ -52,11 +53,10 @@ const formSchema = z.object({
     .custom<FileList>()
     .optional(),
 }).refine(data => {
-    const activeTab = form?.getValues('activeTab');
-    if (activeTab === 'text') {
+    if (data.activeTab === 'text') {
         return !!data.resume && data.resume.length > 0;
     }
-    if (activeTab === 'file') {
+    if (data.activeTab === 'file') {
         return !!data.resumeFile && data.resumeFile.length > 0;
     }
     return false;
@@ -64,8 +64,7 @@ const formSchema = z.object({
     message: "Please upload a resume or paste it as text.",
     path: ["resume"],
 }).refine(data => {
-    const activeTab = form?.getValues('activeTab');
-    if (activeTab === 'file' && data.resumeFile) {
+    if (data.activeTab === 'file' && data.resumeFile) {
         for (let i = 0; i < data.resumeFile.length; i++) {
             if (data.resumeFile[i].size > MAX_FILE_SIZE) {
                 return false;
@@ -77,8 +76,7 @@ const formSchema = z.object({
     message: `Max file size is 4MB per file.`,
     path: ["resumeFile"],
 }).refine(data => {
-    const activeTab = form?.getValues('activeTab');
-    if (activeTab === 'file' && data.resumeFile) {
+    if (data.activeTab === 'file' && data.resumeFile) {
          for (let i = 0; i < data.resumeFile.length; i++) {
             if (!ACCEPTED_FILE_TYPES.includes(data.resumeFile[i].type)) {
                 return false;
@@ -92,7 +90,6 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-let form: any;
 
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -100,9 +97,10 @@ export default function Home() {
   const [activeInputTab, setActiveInputTab] = React.useState("file");
   const { toast } = useToast();
 
-  form = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      activeTab: "file",
       resume: "",
       jobDescription: "",
       modificationPrompt: "",
@@ -113,7 +111,7 @@ export default function Home() {
   
   React.useEffect(() => {
     form.setValue('activeTab', activeInputTab, { shouldValidate: true });
-  }, [activeInputTab]);
+  }, [activeInputTab, form]);
 
 
   const onSubmit = async (values: FormValues) => {
@@ -133,7 +131,7 @@ export default function Home() {
           toast({
             variant: "destructive",
             title: "PDF Processing Error",
-            description: String(error),
+            description: error instanceof Error ? error.message : String(error),
           });
           setIsLoading(false);
           return;
@@ -230,7 +228,7 @@ export default function Home() {
                      <FormField
                         control={form.control}
                         name="resumeFile"
-                        render={({ field: { onChange, ...fieldProps } }) => (
+                        render={({ field: { onChange, value, ...fieldProps } }) => (
                           <FormItem>
                             <FormControl>
                                <div className="flex items-center justify-center w-full">
@@ -400,5 +398,3 @@ export default function Home() {
     </main>
   );
 }
-
-    
