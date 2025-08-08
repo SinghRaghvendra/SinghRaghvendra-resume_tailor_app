@@ -35,6 +35,7 @@ import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { ResumeOutput } from "@/components/resume-output";
 import { CoverLetterOutput } from "@/components/cover-letter-output";
 import { AtsInsightsOutput } from "@/components/ats-insights-output";
+import { Separator } from "@/components/ui/separator";
 
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
@@ -86,7 +87,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
   const [activeInputTab, setActiveInputTab] = React.useState("text");
-  const [activeOutputTab, setActiveOutputTab] = React.useState("resume");
   const { toast } = useToast();
 
   form = useForm<FormValues>({
@@ -310,7 +310,7 @@ export default function Home() {
         </Card>
 
         <div className="mt-8 lg:mt-0">
-          <Card className="sticky top-8 print-container">
+          <Card className="sticky top-8">
             <CardHeader className="flex flex-row items-center justify-between no-print">
               <div className="space-y-1">
                 <CardTitle>Your Tailored Documents</CardTitle>
@@ -318,6 +318,15 @@ export default function Home() {
                   Your AI-optimized resume and cover letter.
                 </CardDescription>
               </div>
+               <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrint}
+                  disabled={!generationResult}
+                  >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+              </Button>
             </CardHeader>
             <CardContent className="min-h-[500px]">
               {isLoading ? (
@@ -340,42 +349,17 @@ export default function Home() {
                   </div>
                 </div>
               ) : generationResult ? (
-                <Tabs value={activeOutputTab} onValueChange={setActiveOutputTab} className="w-full">
-                  <div className="flex justify-between items-center mb-4 no-print">
-                    <TabsList>
-                      <TabsTrigger value="resume">Resume</TabsTrigger>
-                      <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-                      <TabsTrigger value="ats-insights">
-                        <Lightbulb className="mr-2 h-4 w-4" />
-                        ATS Insights
-                      </TabsTrigger>
-                    </TabsList>
-                     <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handlePrint}
-                            disabled={activeOutputTab === 'ats-insights'}
-                            >
-                            <Download className="h-4 w-4 mr-2" />
-                            Download
-                        </Button>
-                    </div>
+                <>
+                  <div id="printable-area">
+                    <ResumeOutput {...generationResult} />
+                    <div className="p-8"><Separator /></div>
+                    <CoverLetterOutput {...generationResult} />
                   </div>
-                  <TabsContent value="resume" className="printable" data-printable={activeOutputTab === 'resume'}>
-                     <div id="resume-output">
-                        <ResumeOutput {...generationResult} />
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="cover-letter" className="printable" data-printable={activeOutputTab === 'cover-letter'}>
-                    <div id="cover-letter-output">
-                        <CoverLetterOutput {...generationResult} />
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="ats-insights">
-                    <AtsInsightsOutput {...generationResult} />
-                  </TabsContent>
-                </Tabs>
+                  <div className="no-print mt-8">
+                    <Separator className="my-6" />
+                     <AtsInsightsOutput {...generationResult} />
+                  </div>
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg no-print">
                   <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />

@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, MapPin, Linkedin, Dot, Link } from "lucide-react";
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <section className="mb-6">
+  <section className="mb-6 break-after-page">
     <h2 className="text-xl font-bold text-primary border-b-2 border-primary pb-1 mb-3">{title.toUpperCase()}</h2>
     <div className="text-sm">{children}</div>
   </section>
@@ -11,7 +11,7 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
 
 export const ResumeOutput = (props: ExtractAndMatchOutput) => {
   return (
-    <div className="bg-white text-gray-800 p-8 font-sans text-sm printable-container">
+    <div className="bg-white text-gray-800 p-8 font-sans text-sm">
       <header className="text-center mb-8">
         <h1 className="text-4xl font-extrabold tracking-tight mb-1 text-gray-900">{props.name}</h1>
         <div className="flex justify-center items-center space-x-4 text-xs text-muted-foreground">

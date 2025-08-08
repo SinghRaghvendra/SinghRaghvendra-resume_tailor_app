@@ -14,7 +14,7 @@ export const CoverLetterOutput = (props: ExtractAndMatchOutput) => {
   };
 
   return (
-    <div className="bg-white text-gray-800 p-8 font-sans text-sm printable-container">
+    <div className="bg-white text-gray-800 p-8 font-sans text-sm">
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{props.name}</h1>
         <div className="flex flex-col space-y-1 text-xs text-muted-foreground">
