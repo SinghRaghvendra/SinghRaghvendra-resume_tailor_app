@@ -21,7 +21,7 @@ export const ResumeOutput = (props: ExtractAndMatchOutput) => {
         </div>
       </header>
 
-      <main className="space-y-4">
+      <main>
         {props.objective && (
             <Section title="Objective">
               <p className="text-gray-700">{props.objective}</p>
