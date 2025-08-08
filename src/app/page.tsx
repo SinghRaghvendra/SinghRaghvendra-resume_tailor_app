@@ -109,6 +109,8 @@ export default function Home() {
     mode: 'onChange',
   });
   
+  const resumeFileRef = form.register("resumeFile");
+
   React.useEffect(() => {
     form.setValue('activeTab', activeInputTab, { shouldValidate: true });
   }, [activeInputTab, form]);
@@ -160,7 +162,7 @@ export default function Home() {
         variant: "destructive",
         title: "An error occurred",
         description:
-          error instanceof Error ? error.message : "Failed to tailor resume. Please check your inputs and try again.",
+          error instanceof Error ? `An unexpected error occurred: ${error.message}` : "Failed to tailor resume. Please check your inputs and try again.",
       });
     } finally {
       setIsLoading(false);
@@ -228,7 +230,7 @@ export default function Home() {
                      <FormField
                         control={form.control}
                         name="resumeFile"
-                        render={({ field: { onChange, ...fieldProps } }) => (
+                        render={({ field }) => (
                           <FormItem>
                             <FormControl>
                                <div className="flex items-center justify-center w-full">
@@ -240,8 +242,10 @@ export default function Home() {
                                             <p className="text-xs text-muted-foreground">PDFs (MAX. 4MB each)</p>
                                         </div>
                                         <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf" multiple
-                                            {...fieldProps}
-                                            onChange={(e) => onChange(e.target.files)}
+                                            {...resumeFileRef}
+                                            onChange={(e) => {
+                                                field.onChange(e.target.files)
+                                            }}
                                          />
                                     </label>
                                 </div> 
