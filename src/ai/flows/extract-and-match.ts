@@ -58,6 +58,8 @@ const ExtractAndMatchOutputSchema = z.object({
   certifications: z.array(z.string()),
   hobbies: z.array(z.string()),
   coverLetter: z.string().describe('A tailored cover letter for the job application.'),
+  atsScore: z.number().describe('An estimated ATS match score percentage (e.g., 85 for 85%).'),
+  improvementSuggestions: z.array(z.string()).describe('A list of actionable suggestions to improve the resume and cover letter.'),
 });
 export type ExtractAndMatchOutput = z.infer<typeof ExtractAndMatchOutputSchema>;
 
@@ -69,7 +71,7 @@ const prompt = ai.definePrompt({
   name: 'extractAndMatchPrompt',
   input: {schema: ExtractAndMatchInputSchema},
   output: {schema: ExtractAndMatchOutputSchema},
-  prompt: `You are an expert resume tailor and career coach with deep knowledge of Applicant Tracking Systems (ATS). Your task is to parse the provided resume, tailor it to a specific job description aiming for a 90% match for skills and keywords, generate a compelling cover letter, and return everything as a structured JSON object. The final resume should be a maximum of 3 pages.
+  prompt: `You are an expert resume tailor and career coach with deep knowledge of Applicant Tracking Systems (ATS). Your task is to parse the provided resume, tailor it to a specific job description aiming for a 90% match for skills and keywords, generate a compelling cover letter, calculate an ATS score, provide improvement suggestions, and return everything as a structured JSON object. The final resume should be a maximum of 3 pages.
 
 Your primary goal is to strategically incorporate relevant skills and keywords from the job description into the resume and cover letter. You must analyze the job description to identify the most critical skills, qualifications, and experiences.
 
@@ -87,7 +89,8 @@ Instructions:
 5.  **Create Portfolio Section:** Identify and extract any projects mentioned in the resume. Format them for a new "Portfolio" section. If no projects are mentioned, you can leave this section empty.
 6.  **Generate Cover Letter:** Write a professional and compelling cover letter. The cover letter should be tailored to the job description, highlight the candidate's most relevant qualifications from the tailored resume, and express genuine interest in the role and company. The tone should be professional yet personable. The output should be a single string with markdown for formatting (e.g., newlines for paragraphs).
 7.  **Rewrite for Impact:** Review and rewrite the entire resume for clarity, impact, and professional tone. The final output must be polished and free of grammatical errors, making it stand out.
-8.  **Format Output:** Return the complete, tailored resume and the cover letter as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
+8.  **ATS Score & Suggestions:** Calculate an estimated ATS match score as a percentage based on the alignment between the tailored resume and the job description. Provide a list of specific, actionable suggestions for what the user could do to further improve their resume and cover letter to increase their chances of getting an interview.
+9.  **Format Output:** Return the complete, tailored resume, the cover letter, ATS score, and suggestions as a single JSON object conforming to the specified output schema. Ensure all fields are populated correctly.
 
 {{#if modificationPrompt}}
 **User Modifications:**

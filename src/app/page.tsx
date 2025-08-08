@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Download, Loader2, Sparkles, Wand2, Upload } from "lucide-react";
+import { Download, Loader2, Sparkles, Wand2, Upload, Lightbulb } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +34,8 @@ import { Input } from "@/components/ui/input";
 import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { ResumeOutput } from "@/components/resume-output";
 import { CoverLetterOutput } from "@/components/cover-letter-output";
+import { AtsInsightsOutput } from "@/components/ats-insights-output";
+
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
 const ACCEPTED_FILE_TYPES = ["application/pdf"];
@@ -147,7 +149,7 @@ export default function Home() {
         variant: "destructive",
         title: "An error occurred",
         description:
-          "Failed to tailor resume. Please check your inputs and try again.",
+          error instanceof Error ? error.message : "Failed to tailor resume. Please check your inputs and try again.",
       });
     } finally {
       setIsLoading(false);
@@ -343,12 +345,17 @@ export default function Home() {
                     <TabsList>
                       <TabsTrigger value="resume">Resume</TabsTrigger>
                       <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                      <TabsTrigger value="ats-insights">
+                        <Lightbulb className="mr-2 h-4 w-4" />
+                        ATS Insights
+                      </TabsTrigger>
                     </TabsList>
                      <div className="flex gap-2">
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={handlePrint}
+                            disabled={activeOutputTab === 'ats-insights'}
                             >
                             <Download className="h-4 w-4 mr-2" />
                             Download
@@ -364,6 +371,9 @@ export default function Home() {
                     <div id="cover-letter-output">
                         <CoverLetterOutput {...generationResult} />
                     </div>
+                  </TabsContent>
+                  <TabsContent value="ats-insights">
+                    <AtsInsightsOutput {...generationResult} />
                   </TabsContent>
                 </Tabs>
               ) : (
