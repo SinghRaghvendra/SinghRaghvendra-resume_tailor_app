@@ -47,18 +47,22 @@ export async function generateTailoredResumeAction(
 }
 
 export async function extractTextFromPdfAction(formData: FormData): Promise<string> {
-    const file = formData.get('file') as File;
-    if (!file) {
-        throw new Error('No file uploaded.');
+    const files = formData.getAll('file') as File[];
+    if (!files || files.length === 0) {
+        throw new Error('No files uploaded.');
     }
 
     try {
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const data = await pdf(buffer);
-        return data.text;
+        let combinedText = '';
+        for (const file of files) {
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const data = await pdf(buffer);
+            combinedText += data.text + '\n\n';
+        }
+        return combinedText;
     } catch (error) {
         console.error("Failed to parse PDF", error);
-        throw new Error("Failed to extract text from PDF.");
+        throw new Error("Failed to extract text from one or more PDFs.");
     }
 }

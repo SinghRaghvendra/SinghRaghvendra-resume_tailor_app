@@ -63,16 +63,24 @@ const formSchema = z.object({
     message: "Please upload a resume or paste it as text.",
     path: ["resume"],
 }).refine(data => {
-    if (form?.getValues('activeTab') === 'file' && data.resumeFile?.[0]) {
-        return data.resumeFile?.[0]?.size <= MAX_FILE_SIZE;
+    if (form?.getValues('activeTab') === 'file' && data.resumeFile) {
+        for (let i = 0; i < data.resumeFile.length; i++) {
+            if (data.resumeFile[i].size > MAX_FILE_SIZE) {
+                return false;
+            }
+        }
     }
     return true;
 }, {
-    message: `Max file size is 4MB.`,
+    message: `Max file size is 4MB per file.`,
     path: ["resumeFile"],
 }).refine(data => {
-    if (form?.getValues('activeTab') === 'file' && data.resumeFile?.[0]) {
-        return ACCEPTED_FILE_TYPES.includes(data.resumeFile?.[0]?.type);
+    if (form?.getValues('activeTab') === 'file' && data.resumeFile) {
+         for (let i = 0; i < data.resumeFile.length; i++) {
+            if (!ACCEPTED_FILE_TYPES.includes(data.resumeFile[i].type)) {
+                return false;
+            }
+        }
     }
     return true;
 }, {
@@ -86,7 +94,7 @@ let form: any;
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
-  const [activeInputTab, setActiveInputTab] = React.useState("text");
+  const [activeInputTab, setActiveInputTab] = React.useState("file");
   const { toast } = useToast();
 
   form = useForm<FormValues>({
@@ -114,7 +122,9 @@ export default function Home() {
       if (activeInputTab === 'file' && values.resumeFile?.[0]) {
         try {
             const formData = new FormData();
-            formData.append('file', values.resumeFile[0]);
+            for (let i = 0; i < values.resumeFile.length; i++) {
+              formData.append('file', values.resumeFile[i]);
+            }
             resumeText = await extractTextFromPdfAction(formData);
         } catch (error) {
           toast({
@@ -169,6 +179,14 @@ export default function Home() {
     });
   };
 
+  const renderFileNames = () => {
+    const files = form.watch('resumeFile');
+    if (files && files.length > 0) {
+      return Array.from(files).map((file: File) => file.name).join(', ');
+    }
+    return '';
+  }
+
   return (
     <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
@@ -201,10 +219,42 @@ export default function Home() {
                   <div className="flex justify-between items-center mb-2">
                     <FormLabel>Your Resume</FormLabel>
                     <TabsList className="grid w-full max-w-[220px] grid-cols-2 h-9">
-                      <TabsTrigger value="text">Text</TabsTrigger>
                       <TabsTrigger value="file">PDF</TabsTrigger>
+                      <TabsTrigger value="text">Text</TabsTrigger>
                     </TabsList>
                   </div>
+                   <TabsContent value="file">
+                     <FormField
+                        control={form.control}
+                        name="resumeFile"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                               <div className="flex items-center justify-center w-full">
+                                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted">
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                                            {form.watch('resumeFile')?.[0]?.name ? (
+                                                <p className="font-semibold text-primary px-2 text-center">{renderFileNames()}</p>
+                                            ) : (
+                                                <>
+                                                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                                    <p className="text-xs text-muted-foreground">PDFs (MAX. 4MB each)</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf" multiple
+                                            onChange={(e) => field.onChange(e.target.files)}
+                                            ref={field.ref}
+                                         />
+                                    </label>
+                                </div> 
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                  </TabsContent>
                   <TabsContent value="text">
                     <FormField
                       control={form.control}
@@ -224,38 +274,6 @@ export default function Home() {
                       )}
                     />
                      <Button type="button" variant="link" size="sm" className="p-0 h-auto mt-2" onClick={handleUseSample}>Try with an example</Button>
-                  </TabsContent>
-                  <TabsContent value="file">
-                     <FormField
-                        control={form.control}
-                        name="resumeFile"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                               <div className="flex items-center justify-center w-full">
-                                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-border border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted">
-                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                                            {form.watch('resumeFile')?.[0]?.name ? (
-                                                <p className="font-semibold text-primary">{form.watch('resumeFile')[0].name}</p>
-                                            ) : (
-                                                <>
-                                                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                                    <p className="text-xs text-muted-foreground">PDF (MAX. 4MB)</p>
-                                                </>
-                                            )}
-                                        </div>
-                                        <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf"
-                                            onChange={(e) => field.onChange(e.target.files)}
-                                            ref={field.ref}
-                                         />
-                                    </label>
-                                </div> 
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                   </TabsContent>
                 </Tabs>
 
