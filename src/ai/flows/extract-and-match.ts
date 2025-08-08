@@ -40,7 +40,7 @@ const EducationItemSchema = z.object({
 const PortfolioItemSchema = z.object({
     projectName: z.string().describe("The name or title of the project."),
     description: z.string().describe("A brief description of the project, ideally a single sentence."),
-    url: z.string().url().optional().describe("A URL to the project if available."),
+    url: z.string().optional().describe("A URL to the project if available."),
 });
 
 
