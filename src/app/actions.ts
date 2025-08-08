@@ -39,6 +39,9 @@ export async function generateTailoredResumeAction(
     return result;
   } catch (error) {
     console.error("Error in generateTailoredResumeAction:", error);
+    if (error instanceof Error) {
+        throw new Error(`An unexpected error occurred: ${error.message}`);
+    }
     throw new Error("An unexpected error occurred while tailoring the resume.");
   }
 }
