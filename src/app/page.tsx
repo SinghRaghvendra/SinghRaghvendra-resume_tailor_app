@@ -84,6 +84,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
   const [activeInputTab, setActiveInputTab] = React.useState("text");
+  const [activeOutputTab, setActiveOutputTab] = React.useState("resume");
   const { toast } = useToast();
 
   form = useForm<FormValues>({
@@ -153,16 +154,8 @@ export default function Home() {
     }
   };
 
-  const handlePrint = (selector: string) => {
-    const printContent = document.querySelector(selector);
-    if (printContent) {
-      const originalContents = document.body.innerHTML;
-      document.body.innerHTML = printContent.innerHTML;
-      window.print();
-      document.body.innerHTML = originalContents;
-      // we need to re-bind the form to the new dom
-      window.location.reload(); 
-    }
+  const handlePrint = () => {
+    window.print();
   };
   
   const handleUseSample = () => {
@@ -189,7 +182,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-12">
-        <Card className="w-full">
+        <Card className="w-full no-print">
           <CardHeader>
             <CardTitle>Your Details</CardTitle>
             <CardDescription>
@@ -315,8 +308,8 @@ export default function Home() {
         </Card>
 
         <div className="mt-8 lg:mt-0">
-          <Card className="sticky top-8">
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card className="sticky top-8 print-container">
+            <CardHeader className="flex flex-row items-center justify-between no-print">
               <div className="space-y-1">
                 <CardTitle>Your Tailored Documents</CardTitle>
                 <CardDescription>
@@ -345,8 +338,8 @@ export default function Home() {
                   </div>
                 </div>
               ) : generationResult ? (
-                <Tabs defaultValue="resume" className="w-full">
-                  <div className="flex justify-between items-center mb-4">
+                <Tabs value={activeOutputTab} onValueChange={setActiveOutputTab} className="w-full">
+                  <div className="flex justify-between items-center mb-4 no-print">
                     <TabsList>
                       <TabsTrigger value="resume">Resume</TabsTrigger>
                       <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
@@ -355,36 +348,26 @@ export default function Home() {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handlePrint('#resume-output')}
-                            className="no-print"
+                            onClick={handlePrint}
                             >
                             <Download className="h-4 w-4 mr-2" />
-                            Resume
-                        </Button>
-                         <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePrint('#cover-letter-output')}
-                            className="no-print"
-                            >
-                            <Download className="h-4 w-4 mr-2" />
-                            Letter
+                            Download
                         </Button>
                     </div>
                   </div>
-                  <TabsContent value="resume">
-                     <div id="resume-output" className="printable">
+                  <TabsContent value="resume" className="printable" data-printable={activeOutputTab === 'resume'}>
+                     <div id="resume-output">
                         <ResumeOutput {...generationResult} />
                     </div>
                   </TabsContent>
-                  <TabsContent value="cover-letter">
-                    <div id="cover-letter-output" className="printable">
+                  <TabsContent value="cover-letter" className="printable" data-printable={activeOutputTab === 'cover-letter'}>
+                    <div id="cover-letter-output">
                         <CoverLetterOutput {...generationResult} />
                     </div>
                   </TabsContent>
                 </Tabs>
               ) : (
-                <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg">
+                <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 border-2 border-dashed border-border rounded-lg no-print">
                   <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold text-foreground">
                     Ready to stand out?
