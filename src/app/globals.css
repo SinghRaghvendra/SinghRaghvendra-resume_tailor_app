@@ -75,9 +75,45 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: hsl(var(--background));
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('https://storage.googleapis.com/studiogpt-test-artifacts/087e53f1-4395-430c-8438-e673f4e3b747.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+    z-index: -1;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(45deg, hsla(var(--primary), 0.1), hsla(var(--background), 0.3), hsla(var(--accent), 0.1));
+    background-size: 400% 400%;
+    animation: gradientAnimation 15s ease infinite;
+    opacity: 0.8;
+    z-index: -1;
   }
 }
+
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
 @layer components {
   .marquee-container {
@@ -104,5 +140,3 @@
     }
   }
 }
-
-    
