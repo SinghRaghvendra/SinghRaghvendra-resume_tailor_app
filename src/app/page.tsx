@@ -6,7 +6,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Sparkles, Wand2, Upload, FileText, FileDown, Mail, CheckCircle } from "lucide-react";
+import { Loader2, Sparkles, Wand2, Upload, FileDown, Mail, CheckCircle, Lightbulb } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -56,7 +56,7 @@ const formSchema = z.object({
     return (data.resume && data.resume.length > 0) || (!!data.resumeFile && data.resumeFile.length > 0);
 }, {
     message: "Please upload a resume or paste it as text.",
-    path: ["resume"],
+    path: ["resumeFile"], // Point error to file input for better UX
 }).refine(data => {
     if (data.resumeFile) {
         for (let i = 0; i < data.resumeFile.length; i++) {
@@ -219,6 +219,15 @@ export default function Home() {
     "Secure & Production-Ready"
   ];
 
+  const keyFeaturesMarketing = [
+    { text: "Tailored Resume in Seconds – Upload a job description and instantly get a high-scoring, ATS-optimized version of your resume." },
+    { text: "Smart Cover Letter Generator – Generate a professional, personalized cover letter that complements your resume." },
+    { text: "Prompt Optimization – Fine-tune your resume with AI-guided prompts for better impact." },
+    { text: "Feedback & Improvement – Get instant feedback on weak points and actionable tips to improve." },
+    { text: "Top Matching Skills & Keywords – Highlight strengths recruiters care about most." },
+    { text: "Boost Your Interview Chances – Increase your chances of getting shortlisted with every application." },
+  ];
+
   return (
     <>
     <div className={`no-print print-container--${activeDocument}`}>
@@ -323,7 +332,7 @@ export default function Home() {
                                 />
                             </FormControl>
                             <FormMessage />
-                            {form.formState.errors.resume && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
+                             {form.formState.errors.resume && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
                             </FormItem>
                         )}
                         />
@@ -464,6 +473,34 @@ export default function Home() {
             </Card>
             </div>
         </div>
+
+        <section className="mt-24 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">Why Resume Tailor?</h2>
+          <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">
+            In today’s world of endless job listings and complex job descriptions, sending the same generic resume is a shortcut to rejection. Applicant Tracking Systems (ATS) demand precision. That’s where we come in.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+            <div className="bg-muted/30 p-8 rounded-lg">
+                <h3 className="text-xl font-semibold flex items-center"><Sparkles className="h-6 w-6 mr-3 text-primary" />Our Unique Value Proposition</h3>
+                <p className="mt-3 text-muted-foreground">
+                    Instantly transform your resume into a job-winning application. Our AI doesn’t just format—it understands the job description, matches it with your experience, and crafts a tailored resume + cover letter designed to beat ATS filters and impress recruiters.
+                </p>
+            </div>
+             <div className="bg-muted/30 p-8 rounded-lg">
+                 <h3 className="text-xl font-semibold flex items-center"><Wand2 className="h-6 w-6 mr-3 text-primary" />Key Features</h3>
+                 <ul className="mt-4 space-y-3">
+                    {keyFeaturesMarketing.map((feature, index) => (
+                         <li key={index} className="flex items-start">
+                            <CheckCircle className="h-5 w-5 mr-3 mt-1 text-green-500 flex-shrink-0" />
+                            <span className="text-muted-foreground">{feature.text}</span>
+                        </li>
+                    ))}
+                 </ul>
+            </div>
+          </div>
+        </section>
+
         </main>
         <footer className="bg-muted/50 mt-16 py-8">
           <div className="container mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -507,5 +544,3 @@ export default function Home() {
     </>
   );
 }
-
-    
