@@ -6,7 +6,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Sparkles, Wand2, Upload, FileText, FileDown, Mail } from "lucide-react";
+import { Loader2, Sparkles, Wand2, Upload, FileText, FileDown, Mail, CheckCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -206,6 +206,19 @@ export default function Home() {
     return 'No files selected';
   }
 
+  const topFeatures = [
+    "AI-Powered Resume Tailoring",
+    "AI Cover Letter Generation",
+    "ATS Score Analysis & Matching",
+    "Top Keyword Identification",
+    "Actionable Improvement Suggestions",
+    "Multi-PDF Resume Merging",
+    "DOCX & PDF Document Export",
+    "Accepts both PDF and Text",
+    "Modern, Responsive Interface",
+    "Secure & Production-Ready"
+  ];
+
   return (
     <>
     <div className={`no-print print-container--${activeDocument}`}>
@@ -224,6 +237,18 @@ export default function Home() {
             description and your experience to highlight your most relevant
             skills.
             </p>
+        </div>
+
+         <div className="mb-16">
+            <h2 className="text-2xl font-bold text-center mb-6">Top Features</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 text-sm">
+              {topFeatures.map((feature, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span className="text-muted-foreground">{feature}</span>
+                </div>
+              ))}
+            </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-12">
@@ -482,3 +507,5 @@ export default function Home() {
     </>
   );
 }
+
+    
