@@ -6,7 +6,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Sparkles, Wand2, Upload, FileDown, Mail, CheckCircle, Lightbulb } from "lucide-react";
+import { Loader2, Sparkles, Wand2, Upload, FileDown, Mail, CheckCircle, Lightbulb, ArrowLeft, Bell } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,6 @@ import { useToast } from "@/hooks/use-toast";
 import { generateTailoredResumeAction, extractTextFromPdfAction, generateDocxAction } from "@/app/actions";
 import { SAMPLE_RESUME } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Logo } from "@/components/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import type { ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
@@ -230,13 +229,33 @@ export default function Home() {
   return (
     <>
     <div className={`no-print print-container--${activeDocument}`}>
-        <header className="absolute top-0 right-0 p-4">
+        <header className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center">
+          <Button variant="outline" size="sm" asChild>
+            <a href="https://aicouncel.com/">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Go Home
+            </a>
+          </Button>
           <p className="text-sm font-semibold text-muted-foreground">Powered by <a href="mailto:support@aicouncel.com" className="text-primary hover:underline">AI Councel</a></p>
         </header>
+        
+        <main className="container mx-auto px-4 pt-24 pb-12 md:px-6 lg:pt-28 lg:pb-16">
 
-        <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4 text-center">
+            <h2 className="font-bold flex items-center justify-center">
+                <Bell className="h-5 w-5 mr-2" />
+                Now Live: Margdarshak AI by AI Councel Lab
+            </h2>
+            <p className="text-sm mt-1">Discover your strengths, unlock a 10-year career roadmap, or instantly tailor your resume for any job application. Let AI guide your journey to success.</p>
+        </div>
+        
+        <div className="marquee-container bg-primary text-primary-foreground mb-12">
+            <div className="marquee-text">
+                Your AI-powered partner for career success. Get personalized career guidance or tailor your resume instantly to land the right opportunity.
+            </div>
+        </div>
+
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <Logo className="h-14 w-14 text-primary" />
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
             Resume Tailor
             </h1>
@@ -538,3 +557,5 @@ export default function Home() {
     </>
   );
 }
+
+    
