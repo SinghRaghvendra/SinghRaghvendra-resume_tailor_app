@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { generateTailoredResumeAction, extractTextFromPdfAction, generateDocxAction } from "@/app/actions";
+import { generateTailoredResumeAction, extractTextFromPdfAction } from "@/app/actions";
 import { SAMPLE_RESUME } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/icons";
@@ -89,7 +89,7 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-type ActiveDocument = 'resume' | 'cover-letter';
+type ActiveDocument = 'resume' | 'cover-letter' | 'insights';
 
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -158,7 +158,7 @@ export default function Home() {
         values.modificationPrompt
       );
       setGenerationResult(result);
-    } catch (error) {
+    } catch (error)
       console.error(error);
       toast({
         variant: "destructive",
@@ -174,54 +174,6 @@ export default function Home() {
   const handlePrint = () => {
     window.print();
   };
-  
-  const handleDownload = async (format: 'pdf' | 'word') => {
-    if (!generationResult) return;
-    
-    setIsDownloading(true);
-    
-    // The printable area now contains both resume and cover letter separated by a page break
-    const printableAreaId = 'printable-area';
-    const filename = `${generationResult.name.replace(/\s+/g, '_')}_Application_Documents`;
-
-    try {
-        if (format === 'pdf') {
-            handlePrint();
-        } else if (format === 'word') {
-            const printableArea = document.getElementById(printableAreaId);
-            if (!printableArea) {
-                throw new Error('Printable area not found');
-            }
-            const htmlContent = printableArea.innerHTML;
-            const base64 = await generateDocxAction(htmlContent);
-
-            const byteCharacters = atob(base64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], {
-                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            });
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${filename}.docx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    } catch (error) {
-        toast({
-            variant: "destructive",
-            title: "Download Error",
-            description: error instanceof Error ? error.message : `Could not generate ${format} document.`,
-        });
-    } finally {
-        setIsDownloading(false);
-    }
-  }
 
   const handleUseSample = () => {
     setActiveInputTab("text");
@@ -242,7 +194,7 @@ export default function Home() {
 
   return (
     <>
-    <div className="no-print">
+    <div className={`no-print print-container--${activeDocument}`}>
         <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <Logo className="h-14 w-14 text-primary" />
@@ -392,17 +344,8 @@ export default function Home() {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleDownload('word')}
-                            disabled={!generationResult || isLoading || isDownloading}
-                            >
-                            {isDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
-                            Word
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownload('pdf')}
-                            disabled={!generationResult || isLoading || isDownloading}
+                            onClick={handlePrint}
+                            disabled={!generationResult || isLoading}
                             >
                             {isDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
                             PDF
@@ -465,14 +408,15 @@ export default function Home() {
         </main>
     </div>
     {generationResult && (
-      <div id="printable-area" className="only-print">
-        <ResumeOutput {...generationResult} />
-        <div className="page-break"></div>
-        <CoverLetterOutput {...generationResult} />
+      <div id="printable-area">
+        <div className="only-print--resume">
+            <ResumeOutput {...generationResult} />
+        </div>
+        <div className="only-print--cover-letter">
+            <CoverLetterOutput {...generationResult} />
+        </div>
       </div>
     )}
     </>
   );
 }
-
-    

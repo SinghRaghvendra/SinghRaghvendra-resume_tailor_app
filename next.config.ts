@@ -18,9 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ['html-to-docx'],
-  },
+  serverExternalPackages: [],
 };
 
 export default nextConfig;
