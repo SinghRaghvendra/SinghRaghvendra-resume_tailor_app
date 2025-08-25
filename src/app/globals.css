@@ -113,30 +113,3 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
-
-@layer components {
-  .marquee-container {
-    overflow: hidden;
-    padding: 0.5rem 0;
-    white-space: nowrap;
-    position: relative;
-  }
-
-  .marquee-text {
-    display: inline-block;
-    padding-left: 100%;
-    animation: marquee 30s linear infinite;
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  @keyframes marquee {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-100%);
-    }
-  }
-}

@@ -241,25 +241,21 @@ export default function Home() {
         
         <main className="container mx-auto px-4 pt-24 pb-12 md:px-6 lg:pt-28 lg:pb-16">
 
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4 text-center">
-            <h2 className="font-bold flex items-center justify-center">
-                <Bell className="h-5 w-5 mr-2" />
-                Now Live: Margdarshak AI by AI Councel Lab
-            </h2>
-            <p className="text-sm mt-1">Discover your strengths, unlock a 10-year career roadmap, or instantly tailor your resume for any job application. Let AI guide your journey to success.</p>
-             <Button asChild size="sm" className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90">
+         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-12 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+            <div className="flex-1">
+                <h2 className="font-bold flex items-center justify-center md:justify-start">
+                    <Bell className="h-5 w-5 mr-2" />
+                    Now Live: Margdarshak AI by AI Councel Lab
+                </h2>
+                <p className="text-sm mt-1">Discover your strengths, unlock a 10-year career roadmap, or instantly tailor your resume for any job application.</p>
+            </div>
+             <Button asChild size="sm" className="mt-2 md:mt-0 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 shrink-0">
                 <a href="https://aicouncel.com/signup" target="_blank" rel="noopener noreferrer">
                     Take Assessment <ArrowRight className="ml-2 h-4 w-4" />
                 </a>
             </Button>
         </div>
         
-        <div className="marquee-container bg-primary text-primary-foreground mb-12">
-            <div className="marquee-text">
-                Your AI-powered partner for career success. Get personalized career guidance or tailor your resume instantly to land the right opportunity.
-            </div>
-        </div>
-
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
             Resume Tailor
