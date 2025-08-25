@@ -506,7 +506,7 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-2">About Us</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                AI Councel Lab is an innovation-driven AI company building next-generation artificial intelligence solutions for individuals and businesses. We specialize in creating practical and impactful tools powered by cutting-edge AI research. Our products include Margdarshak AI, an intelligent career and learning guide, and the Resume Tailor App, designed to craft personalized, job-ready resumes. With a focus on usability, scalability, and impact, AI Councel Lab is committed to shaping the future of work and life with AI.
+                AI Councel Lab is an innovation-driven AI company that builds next-generation artificial intelligence solutions for individuals and businesses. We specialize in practical and impactful tools powered by advanced AI research and design to deliver measurable value.
               </p>
               <div className="flex items-center gap-2 text-sm">
                 <Mail className="h-4 w-4" />
@@ -514,15 +514,10 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Features of This App Builder</h3>
-              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                <li>AI-Powered Content Generation</li>
-                <li>Secure Environment Variable Management</li>
-                <li>Automated Production Deployments</li>
-                <li>Component-Based UI with ShadCN</li>
-                <li>Responsive Design with Tailwind CSS</li>
-                <li>Built on Next.js for Performance</li>
-              </ul>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Our Vision</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Our vision is to help people discover their true potential and secure the best opportunities to grow and succeed with confidence. We create AI products that make careers smarter and opportunities more accessible. Margdarshak AI serves as an intelligent career and learning guide, while the Resume Tailor App builds personalized job-ready resumes. At AI Councel Lab we focus on usability scalability and real impact, shaping the future of work and life with powerful AI solutions.
+              </p>
             </div>
           </div>
           <div className="text-center text-xs text-muted-foreground mt-8">
