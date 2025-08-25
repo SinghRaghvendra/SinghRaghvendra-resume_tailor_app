@@ -3,6 +3,7 @@
 import { extractAndMatch, ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { z } from "zod";
 import pdf from "pdf-parse/lib/pdf-parse";
+import { generateDocx } from "@/lib/docx-generator";
 
 const actionSchema = z.object({
   resumeText: z.string().min(1, "Resume text is required."),
@@ -65,4 +66,19 @@ export async function extractTextFromPdfAction(formData: FormData): Promise<stri
         console.error("Failed to parse PDF", error);
         throw new Error("Failed to extract text from one or more PDFs.");
     }
+}
+
+
+export async function generateDocxAction(htmlContent: string): Promise<string> {
+  if (!htmlContent) {
+    throw new Error("HTML content is required.");
+  }
+  
+  try {
+    const base64 = await generateDocx(htmlContent);
+    return base64;
+  } catch (error) {
+    console.error("Error generating DOCX file:", error);
+    throw new Error("Failed to generate Word document.");
+  }
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
+import * as ReactDOMServer from 'react-dom/server';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Download, Loader2, Sparkles, Wand2, Upload, FileText, FileDown } from "lucide-react";
+import { Loader2, Sparkles, Wand2, Upload, FileText, FileDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { generateTailoredResumeAction, extractTextFromPdfAction } from "@/app/actions";
+import { generateTailoredResumeAction, extractTextFromPdfAction, generateDocxAction } from "@/app/actions";
 import { SAMPLE_RESUME } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/icons";
@@ -158,7 +159,7 @@ export default function Home() {
         values.modificationPrompt
       );
       setGenerationResult(result);
-    } catch (error)
+    } catch (error) {
       console.error(error);
       toast({
         variant: "destructive",
@@ -182,6 +183,31 @@ export default function Home() {
       title: "Sample resume loaded",
       description: "A sample resume has been added to the form.",
     });
+  };
+
+  const handleDownloadDocx = async () => {
+    if (!generationResult) return;
+    setIsDownloading(true);
+    try {
+        const componentToRender = activeDocument === 'resume'
+            ? <ResumeOutput {...generationResult} />
+            : <CoverLetterOutput {...generationResult} />;
+        
+        const htmlContent = ReactDOMServer.renderToStaticMarkup(componentToRender);
+        const base64 = await generateDocxAction(htmlContent);
+        const link = document.createElement("a");
+        link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${base64}`;
+        link.download = `${activeDocument}.docx`;
+        link.click();
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Download Error",
+        description: "Failed to generate Word document.",
+      });
+    } finally {
+        setIsDownloading(false);
+    }
   };
 
   const renderFileNames = () => {
@@ -347,8 +373,17 @@ export default function Home() {
                             onClick={handlePrint}
                             disabled={!generationResult || isLoading}
                             >
-                            {isDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
+                            <FileDown className="h-4 w-4 mr-2" />
                             PDF
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDownloadDocx}
+                            disabled={!generationResult || isLoading || isDownloading}
+                            >
+                            {isDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
+                            Word
                         </Button>
                     </div>
                 </CardHeader>
@@ -409,10 +444,10 @@ export default function Home() {
     </div>
     {generationResult && (
       <div id="printable-area">
-        <div className="only-print--resume">
+        <div className="only-print only-print--resume">
             <ResumeOutput {...generationResult} />
         </div>
-        <div className="only-print--cover-letter">
+        <div className="only-print only-print--cover-letter">
             <CoverLetterOutput {...generationResult} />
         </div>
       </div>
