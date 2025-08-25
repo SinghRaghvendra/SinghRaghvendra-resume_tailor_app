@@ -479,7 +479,7 @@ export default function Home() {
             In today’s world of endless job listings and complex job descriptions, sending the same generic resume is a shortcut to rejection. Applicant Tracking Systems (ATS) demand precision. That’s where we come in.
           </p>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+          <div className="mt-12 max-w-4xl mx-auto text-left space-y-12">
             <div className="bg-muted/30 p-8 rounded-lg">
                 <h3 className="text-xl font-semibold flex items-center"><Sparkles className="h-6 w-6 mr-3 text-primary" />Our Unique Value Proposition</h3>
                 <p className="mt-3 text-muted-foreground">
