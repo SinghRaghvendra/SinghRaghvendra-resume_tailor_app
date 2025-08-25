@@ -216,7 +216,6 @@ export default function Home() {
     "DOCX & PDF Document Export",
     "Accepts both PDF and Text",
     "Modern, Responsive Interface",
-    "Secure & Production-Ready"
   ];
 
   const keyFeaturesMarketing = [
