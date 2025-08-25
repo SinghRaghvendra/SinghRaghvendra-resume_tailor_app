@@ -5,3 +5,12 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+env:
+  - variable: GEMINI_API_KEY
+    # This value is a secret. Create it in Secret Manager by running:
+    # firebase apphosting:secrets:set GEMINI_API_KEY
+    # You will be prompted to enter the secret value.
+    secret: GEMINI_API_KEY
+    availability:
+      - RUNTIME
