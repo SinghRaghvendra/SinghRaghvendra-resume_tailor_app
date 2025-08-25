@@ -3,7 +3,7 @@
 import { extractAndMatch, ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { z } from "zod";
 import pdf from "pdf-parse/lib/pdf-parse";
-import { generateDocx } from "@/lib/docx-generator";
+import HTMLtoDOCX from 'html-to-docx';
 
 const actionSchema = z.object({
   resumeText: z.string().min(1, "Resume text is required."),
@@ -75,8 +75,43 @@ export async function generateDocxAction(htmlContent: string): Promise<string> {
   }
   
   try {
-    const base64 = await generateDocx(htmlContent);
-    return base64;
+    const styledHtml = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  font-size: 10pt;
+                  line-height: 1.15;
+                  color: #000;
+              }
+              h1, h2, h3, h4 {
+                  color: #000;
+              }
+              a {
+                color: #0000EE;
+                text-decoration: underline;
+              }
+              .page-break {
+                  page-break-before: always;
+              }
+          </style>
+      </head>
+      <body>
+          ${htmlContent}
+      </body>
+      </html>
+    `;
+
+    const fileBuffer = await HTMLtoDOCX(styledHtml, undefined, {
+        table: { row: { cantSplit: true } },
+        footer: true,
+        pageNumber: true,
+    });
+
+    return (fileBuffer as Buffer).toString('base64');
   } catch (error) {
     console.error("Error generating DOCX file:", error);
     throw new Error("Failed to generate Word document.");
