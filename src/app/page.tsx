@@ -200,6 +200,7 @@ export default function Home() {
         link.download = `${activeDocument}.docx`;
         link.click();
     } catch (error) {
+       console.error("Error downloading docx:", error);
        toast({
         variant: "destructive",
         title: "Download Error",
@@ -447,7 +448,7 @@ export default function Home() {
         <div className="only-print only-print--resume">
             <ResumeOutput {...generationResult} />
         </div>
-        <div className="only-print only-print--cover-letter">
+        <div className="only-print only-print--cover-letter page-break">
             <CoverLetterOutput {...generationResult} />
         </div>
       </div>
@@ -455,3 +456,5 @@ export default function Home() {
     </>
   );
 }
+
+    
