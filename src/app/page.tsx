@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -5,7 +6,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Sparkles, Wand2, Upload, FileText, FileDown } from "lucide-react";
+import { Loader2, Sparkles, Wand2, Upload, FileText, FileDown, Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -208,6 +209,10 @@ export default function Home() {
   return (
     <>
     <div className={`no-print print-container--${activeDocument}`}>
+        <header className="absolute top-0 right-0 p-4">
+          <p className="text-sm font-semibold text-muted-foreground">Powered by <a href="mailto:support@aicouncel.com" className="text-primary hover:underline">AI Councel</a></p>
+        </header>
+
         <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <Logo className="h-14 w-14 text-primary" />
@@ -435,6 +440,34 @@ export default function Home() {
             </div>
         </div>
         </main>
+        <footer className="bg-muted/50 mt-16 py-8">
+          <div className="container mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">About Us</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                AI Councel Lab is an innovation-driven AI company building next-generation artificial intelligence solutions for individuals and businesses. We specialize in creating practical and impactful tools powered by cutting-edge AI research. Our products include Margdarshak AI, an intelligent career and learning guide, and the Resume Tailor App, designed to craft personalized, job-ready resumes. With a focus on usability, scalability, and impact, AI Councel Lab is committed to shaping the future of work and life with AI.
+              </p>
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="h-4 w-4" />
+                <a href="mailto:support@aicouncel.com" className="text-primary hover:underline">Contact us: support@aicouncel.com</a>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Features of This App Builder</h3>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <li>AI-Powered Content Generation</li>
+                <li>Secure Environment Variable Management</li>
+                <li>Automated Production Deployments</li>
+                <li>Component-Based UI with ShadCN</li>
+                <li>Responsive Design with Tailwind CSS</li>
+                <li>Built on Next.js for Performance</li>
+              </ul>
+            </div>
+          </div>
+          <div className="text-center text-xs text-muted-foreground mt-8">
+            &copy; {new Date().getFullYear()} AI Councel Lab. All Rights Reserved.
+          </div>
+        </footer>
     </div>
     {generationResult && (
       <div id="printable-area">
