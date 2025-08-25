@@ -6,7 +6,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Sparkles, Wand2, Upload, FileDown, Mail, CheckCircle, Lightbulb, ArrowLeft, Bell } from "lucide-react";
+import { Loader2, Sparkles, Wand2, Upload, FileDown, Mail, CheckCircle, Lightbulb, ArrowLeft, Bell, ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -247,6 +247,11 @@ export default function Home() {
                 Now Live: Margdarshak AI by AI Councel Lab
             </h2>
             <p className="text-sm mt-1">Discover your strengths, unlock a 10-year career roadmap, or instantly tailor your resume for any job application. Let AI guide your journey to success.</p>
+             <Button asChild size="sm" className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90">
+                <a href="https://aicouncel.com/signup" target="_blank" rel="noopener noreferrer">
+                    Take Assessment <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+            </Button>
         </div>
         
         <div className="marquee-container bg-primary text-primary-foreground mb-12">
@@ -557,5 +562,3 @@ export default function Home() {
     </>
   );
 }
-
-    
