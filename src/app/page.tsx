@@ -42,29 +42,22 @@ const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
 const ACCEPTED_FILE_TYPES = ["application/pdf"];
 
 const formSchema = z.object({
-  activeTab: z.string(),
   resume: z.string().optional(),
+  resumeFile: z
+    .custom<FileList>()
+    .optional(),
   jobDescription: z
     .string()
     .min(50, "Please provide a more detailed job description.")
     .max(10000, "Job description is too long."),
   modificationPrompt: z.string().optional(),
-  resumeFile: z
-    .custom<FileList>()
-    .optional(),
 }).refine(data => {
-    if (data.activeTab === 'text') {
-        return !!data.resume && data.resume.length > 0;
-    }
-    if (data.activeTab === 'file') {
-        return !!data.resumeFile && data.resumeFile.length > 0;
-    }
-    return false;
+    return (data.resume && data.resume.length > 0) || (!!data.resumeFile && data.resumeFile.length > 0);
 }, {
     message: "Please upload a resume or paste it as text.",
     path: ["resume"],
 }).refine(data => {
-    if (data.activeTab === 'file' && data.resumeFile) {
+    if (data.resumeFile) {
         for (let i = 0; i < data.resumeFile.length; i++) {
             if (data.resumeFile[i].size > MAX_FILE_SIZE) {
                 return false;
@@ -76,7 +69,7 @@ const formSchema = z.object({
     message: `Max file size is 4MB per file.`,
     path: ["resumeFile"],
 }).refine(data => {
-    if (data.activeTab === 'file' && data.resumeFile) {
+    if (data.resumeFile) {
          for (let i = 0; i < data.resumeFile.length; i++) {
             if (!ACCEPTED_FILE_TYPES.includes(data.resumeFile[i].type)) {
                 return false;
@@ -103,7 +96,6 @@ export default function Home() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      activeTab: "file",
       resume: "",
       jobDescription: "",
       modificationPrompt: "",
@@ -114,18 +106,13 @@ export default function Home() {
   
   const resumeFileRef = form.register("resumeFile");
 
-  React.useEffect(() => {
-    form.setValue('activeTab', activeInputTab, { shouldValidate: true });
-  }, [activeInputTab, form]);
-
-
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     setGenerationResult(null);
     let resumeText = values.resume;
 
     try {
-      if (activeInputTab === 'file' && values.resumeFile?.length) {
+      if (values.resumeFile?.length) {
         try {
             const formData = new FormData();
             Array.from(values.resumeFile).forEach(file => {
@@ -160,7 +147,6 @@ export default function Home() {
       );
       setGenerationResult(result);
     } catch (error) {
-      console.error(error);
       toast({
         variant: "destructive",
         title: "An error occurred",
@@ -179,6 +165,7 @@ export default function Home() {
   const handleUseSample = () => {
     setActiveInputTab("text");
     form.setValue("resume", SAMPLE_RESUME, { shouldValidate: true });
+    form.setValue("resumeFile", undefined, { shouldValidate: true });
     toast({
       title: "Sample resume loaded",
       description: "A sample resume has been added to the form.",
@@ -200,7 +187,6 @@ export default function Home() {
         link.download = `${activeDocument}.docx`;
         link.click();
     } catch (error) {
-       console.error("Error downloading docx:", error);
        toast({
         variant: "destructive",
         title: "Download Error",
@@ -249,7 +235,14 @@ export default function Home() {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8"
                 >
-                    <Tabs value={activeInputTab} onValueChange={setActiveInputTab} className="w-full">
+                    <Tabs value={activeInputTab} onValueChange={(tab) => {
+                      setActiveInputTab(tab)
+                      if (tab === 'text') {
+                        form.setValue('resumeFile', undefined, { shouldValidate: true });
+                      } else {
+                        form.setValue('resume', '', { shouldValidate: true });
+                      }
+                    }} className="w-full">
                     <div className="flex justify-between items-center mb-2">
                         <FormLabel>Your Resume</FormLabel>
                         <TabsList className="grid w-full max-w-[220px] grid-cols-2 h-9">
@@ -300,7 +293,7 @@ export default function Home() {
                                 />
                             </FormControl>
                             <FormMessage />
-                            {form.formState.errors.resume && activeInputTab === 'file' && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
+                            {form.formState.errors.resume && <FormMessage>{form.formState.errors.resume.message}</FormMessage>}
                             </FormItem>
                         )}
                         />
@@ -456,5 +449,3 @@ export default function Home() {
     </>
   );
 }
-
-    
