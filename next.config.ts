@@ -18,7 +18,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: [],
+  serverExternalPackages: ['@opentelemetry/exporter-jaeger'],
+   webpack: (config, { isServer }) => {
+    if (isServer) {
+        config.externals.push({
+            encoding: 'encoding',
+        });
+    }
+    return config;
+  }
 };
 
 export default nextConfig;
