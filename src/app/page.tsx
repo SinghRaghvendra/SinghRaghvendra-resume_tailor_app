@@ -57,24 +57,18 @@ const formSchema = z.object({
     message: "Please upload a resume or paste it as text.",
     path: ["resumeFile"], // Point error to file input for better UX
 }).refine(data => {
-    if (data.resumeFile) {
-        for (let i = 0; i < data.resumeFile.length; i++) {
-            if (data.resumeFile[i].size > MAX_FILE_SIZE) {
-                return false;
-            }
-        }
+    if (data.resumeFile && data.resumeFile.length > 0) {
+      const file = data.resumeFile[0];
+      return file.size <= MAX_FILE_SIZE;
     }
     return true;
 }, {
-    message: `Max file size is 4MB per file.`,
+    message: `Max file size is 4MB.`,
     path: ["resumeFile"],
 }).refine(data => {
-    if (data.resumeFile) {
-         for (let i = 0; i < data.resumeFile.length; i++) {
-            if (!ACCEPTED_FILE_TYPES.includes(data.resumeFile[i].type)) {
-                return false;
-            }
-        }
+    if (data.resumeFile && data.resumeFile.length > 0) {
+      const file = data.resumeFile[0];
+      return ACCEPTED_FILE_TYPES.includes(file.type);
     }
     return true;
 }, {
@@ -176,7 +170,7 @@ export default function Home() {
     if (files && files.length > 0) {
       return Array.from(files).map((file: File) => file.name).join(', ');
     }
-    return 'No files selected';
+    return 'No file selected';
   }
 
   const topFeatures = [
@@ -295,9 +289,9 @@ export default function Home() {
                                                 <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
                                                 <p className="font-semibold text-primary px-2 text-center">{renderFileNames()}</p>
                                                 <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                                <p className="text-xs text-muted-foreground">PDFs (MAX. 4MB each)</p>
+                                                <p className="text-xs text-muted-foreground">PDF (MAX. 4MB)</p>
                                             </div>
-                                            <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf" multiple
+                                            <Input id="dropzone-file" type="file" className="hidden" accept="application/pdf"
                                                 {...resumeFileRef}
                                                 onChange={(e) => {
                                                     field.onChange(e.target.files)
