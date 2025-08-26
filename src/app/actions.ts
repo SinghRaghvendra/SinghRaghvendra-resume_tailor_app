@@ -2,7 +2,7 @@
 
 import { extractAndMatch, ExtractAndMatchOutput } from "@/ai/flows/extract-and-match";
 import { z } from "zod";
-import pdf from "pdf-parse/lib/pdf-parse";
+import pdf from "pdf-parse";
 
 const actionSchema = z.object({
   resumeText: z.string().min(1, "Resume text is required."),
