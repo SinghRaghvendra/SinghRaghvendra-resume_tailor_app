@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['@opentelemetry/exporter-jaeger', 'encoding'],
+  serverExternalPackages: [],
 };
 
 export default nextConfig;

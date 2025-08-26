@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { generateTailoredResumeAction, extractTextFromPdfAction, generateDocxAction } from "@/app/actions";
+import { generateTailoredResumeAction, extractTextFromPdfAction } from "@/app/actions";
 import { SAMPLE_RESUME } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,7 +87,6 @@ type ActiveDocument = 'resume' | 'cover-letter' | 'insights';
 
 export default function Home() {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isDownloading, setIsDownloading] = React.useState(false);
   const [generationResult, setGenerationResult] = React.useState<ExtractAndMatchOutput | null>(null);
   const [activeInputTab, setActiveInputTab] = React.useState("file");
   const [activeDocument, setActiveDocument] = React.useState<ActiveDocument>('resume');
@@ -172,31 +171,6 @@ export default function Home() {
     });
   };
 
-  const handleDownloadDocx = async () => {
-    if (!generationResult) return;
-    setIsDownloading(true);
-    try {
-        const componentToRender = activeDocument === 'resume'
-            ? <ResumeOutput {...generationResult} />
-            : <CoverLetterOutput {...generationResult} />;
-        
-        const htmlContent = ReactDOMServer.renderToStaticMarkup(componentToRender);
-        const base64 = await generateDocxAction(htmlContent);
-        const link = document.createElement("a");
-        link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${base64}`;
-        link.download = `${activeDocument}.docx`;
-        link.click();
-    } catch (error) {
-       toast({
-        variant: "destructive",
-        title: "Download Error",
-        description: "Failed to generate Word document.",
-      });
-    } finally {
-        setIsDownloading(false);
-    }
-  };
-
   const renderFileNames = () => {
     const files = form.watch('resumeFile');
     if (files && files.length > 0) {
@@ -212,7 +186,7 @@ export default function Home() {
     "Top Keyword Identification",
     "Actionable Improvement Suggestions",
     "Multi-PDF Resume Merging",
-    "DOCX & PDF Document Export",
+    "PDF Document Export",
     "Accepts both PDF and Text",
     "Modern, Responsive Interface",
   ];
@@ -427,15 +401,6 @@ export default function Home() {
                             >
                             <FileDown className="h-4 w-4 mr-2" />
                             PDF
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleDownloadDocx}
-                            disabled={!generationResult || isLoading || isDownloading}
-                            >
-                            {isDownloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
-                            Word
                         </Button>
                     </div>
                 </CardHeader>
