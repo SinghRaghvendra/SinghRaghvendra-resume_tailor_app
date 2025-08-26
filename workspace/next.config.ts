@@ -18,16 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: [],
-  webpack: (config, { isServer }) => {
-    // This is to fix a bug in html-to-docx
-    if (isServer) {
-        config.externals.push({
-            encoding: 'encoding',
-        });
-    }
-    return config;
-  }
+  serverExternalPackages: ['@opentelemetry/exporter-jaeger', 'encoding'],
 };
 
 export default nextConfig;
